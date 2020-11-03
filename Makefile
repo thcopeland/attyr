@@ -7,7 +7,7 @@ TST_OBJ_DIR=./test/obj
 TEST_BIN=run_tests
 
 LIBS=-lm
-CFLAGS=-I$(INC_DIR) -O3 -Wall
+CFLAGS=-I$(INC_DIR) -flto -O3 -Wall
 
 _MAIN_OBJ=matrices.o rasterize.o main.o transform.o
 MAIN_OBJ=$(patsubst %,$(OBJ_DIR)/%,$(_MAIN_OBJ))
@@ -22,7 +22,7 @@ $(TST_OBJ_DIR)/%.o: $(TST_DIR)/%.c
 	gcc -c -o $@ $< $(CFLAGS)
 
 tggr: $(MAIN_OBJ)
-	gcc -o $@ $^ $(LIBS)
+	gcc $(CFLAGS) -o $@ $^ $(LIBS)
 
 test: $(MAIN_OBJ) $(TEST_OBJ)
 	gcc -o $(TEST_BIN) $^ $(LIBS)

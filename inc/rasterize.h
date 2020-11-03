@@ -27,6 +27,17 @@ void rasterize(framebuffer_t *buffer,
               fragment_shader_f frag_shader,
               void *shader_data);
 
-float cp_magnitude(vec2 *a, vec2 *o, vec2 *b);
+/*
+* Returns the magnitude of the cross product of (a-o) and (b-o), considering
+* only the first two components.
+*/
+float cp_magnitude(vec4 *a, vec4 *o, vec4 *b);
+
+/*
+ * Divide the x, y, and z components by the w component.
+ */
+void w_normalize(vec4 *v);
+
+void reset_framebuffer(framebuffer_t *buff);
 
 #endif

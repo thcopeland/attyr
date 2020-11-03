@@ -1493,7 +1493,7 @@ int vert_shader(vec4 *vert1, vec4 *vert2, vec4 *vert3, void *perspective, void *
     static int i;
 
     if (i < 200*len) {
-        float a = 0.1 * (i/len);
+        float a = 0.05 * (i/len);
         mat4 combined, rotate = { .val = {
             cos(a), 0, sin(a), 0,
               0,    1,   0,    0,
@@ -1528,7 +1528,7 @@ void render(framebuffer_t *buff)
         for (int u = 0; u < buff->width; u++) {
             vec3 *c1 = &buff->color[(v+1)*buff->width + u],
                  *c2 = &buff->color[v*buff->width + u];
-            int r1 = 255*c1->val[0], g1 = 255*c1->val[1], b1 = 255*c1->val[2],
+            unsigned char r1 = 255*c1->val[0], g1 = 255*c1->val[1], b1 = 255*c1->val[2],
                 r2 = 255*c2->val[0], g2 = 255*c2->val[1], b2 = 255*c2->val[2];
 
             printf("\x1b[48;2;%i;%i;%i;38;2;%i;%i;%im\u2584", r1,g1,b1, r2,g2,b2);
@@ -1539,21 +1539,22 @@ void render(framebuffer_t *buff)
 
 int main(int argc, char **argv) {
     mat4 perspective;
-    perspective_transform(&perspective, -0.4, 0.4, -0.2, 0.2, 0.3, 10);
+    perspective_transform(&perspective, -0.4, 0.4, -0.2, 0.2, 0.3, 6);
 
-    vec3 color_buffer[8160];
-    float depth_buffer[8160];
+    vec3 color_buffer[10508];
+    float depth_buffer[10508];
     framebuffer_t buff = {
         .color = color_buffer,
         .depth = depth_buffer,
-        .width = 120,
-        .height = 68
+        .width = 142,
+        .height = 72
     };
 
     for (int i = 0; i < 200; i++) {
+        reset_framebuffer(&buff);
         rasterize(&buff, vert_shader, frag_shader, &perspective);
         render(&buff);
-        // usleep(10000);
+        usleep(10000);
     }
 
     return 0;

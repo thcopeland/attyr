@@ -10,23 +10,23 @@ void perspective_transform(mat4 *matrix,
 {
     float width = right-left, height = top-bottom, depth = far-near;
 
-    matrix->val[0] = 2*near/width;
-    matrix->val[1] = 0;
-    matrix->val[2] = (right+left)/width;
-    matrix->val[3] = 0;
+    matrix->m11 = 2*near/width;
+    matrix->m12 = 0;
+    matrix->m13 = (right+left)/width;
+    matrix->m14 = 0;
 
-    matrix->val[4] = 0;
-    matrix->val[5] = 2*near/height;
-    matrix->val[6] = (top+bottom)/height;
-    matrix->val[7] = 0;
+    matrix->m21 = 0;
+    matrix->m22 = 2*near/height;
+    matrix->m23 = (top+bottom)/height;
+    matrix->m24 = 0;
 
-    matrix->val[8] = 0;
-    matrix->val[9] = 0;
-    matrix->val[10] = -(near+far)/depth;
-    matrix->val[11] = -2*near*far/depth;
+    matrix->m31 = 0;
+    matrix->m32 = 0;
+    matrix->m33 = -(near+far)/depth;
+    matrix->m34 = -2*near*far/depth;
 
-    matrix->val[12] = 0;
-    matrix->val[13] = 0;
-    matrix->val[14] = -1;
-    matrix->val[15] = 0;
+    matrix->m41 = 0;
+    matrix->m42 = 0;
+    matrix->m43 = -1;
+    matrix->m44 = 0;
 }

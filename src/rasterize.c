@@ -21,19 +21,19 @@ void rasterize(framebuffer_t *buff,
         w_normalize(&v3);
 
         float l1, l2, l3, area = fabs(cp_magnitude(&v1, &v2, &v3));
-        int max_u = clamp(0, buff->width, (max3(v1.val[0], v2.val[0], v3.val[0])+1)*buff->width/2+1),
-            max_v = clamp(0, buff->height, (max3(v1.val[1], v2.val[1], v3.val[1])+1)*buff->height/2+1),
-            min_u = clamp(0, buff->width, (min3(v1.val[0], v2.val[0], v3.val[0])+1)*buff->width/2),
-            min_z = min3(v1.val[2], v2.val[2], v3.val[2]),
-            v     = clamp(0, buff->height, (min3(v1.val[1], v2.val[1], v3.val[1])+1)*buff->height/2),
+        int max_u = clamp(0, buff->width, (max3(v1.x, v2.x, v3.x)+1)*buff->width/2+1),
+            max_v = clamp(0, buff->height,(max3(v1.y, v2.y, v3.y)+1)*buff->height/2+1),
+            min_u = clamp(0, buff->width, (min3(v1.x, v2.x, v3.x)+1)*buff->width/2),
+            min_z = min3(v1.z, v2.z, v3.z),
+            v     = clamp(0, buff->height, (min3(v1.y, v2.y, v3.y)+1)*buff->height/2),
             u;
 
         if (min_z <= 1) {
             for (; v<max_v; v++) {
                 for (u=min_u; u<max_u; u++) {
                     int any_drawn = 0;
-                    pos.val[1] = (float) 2*v/buff->height-1;
-                    pos.val[0] = (float) 2*u/buff->width-1;
+                    pos.y = (float) 2*v/buff->height-1;
+                    pos.x = (float) 2*u/buff->width-1;
 
                     if ((l1=cp_magnitude(&pos, &v3, &v2)) >= 0 &&
                         (l2=cp_magnitude(&pos, &v1, &v3)) >= 0 &&
@@ -42,18 +42,18 @@ void rasterize(framebuffer_t *buff,
                         l2 /= area;
                         l3 /= area;
 
-                        pos.val[2] = 1/(l1/v1.val[2] + l2/v2.val[2] + l3/v3.val[2]);
+                        pos.z = 1/(l1/v1.z + l2/v2.z + l3/v3.z);
 
-                        if (pos.val[2] > 0 && pos.val[2] < buff->depth[v*buff->width + u]) {
+                        if (pos.z > 0 && pos.z < buff->depth[v*buff->width + u]) {
                             any_drawn = 1;
-                            buff->depth[v*buff->width + u] = pos.val[2];
+                            buff->depth[v*buff->width + u] = pos.z;
 
-                            l1 *= (pos.val[2]/v1.val[2]);
-                            l2 *= (pos.val[2]/v2.val[2]);
-                            l3 *= (pos.val[2]/v3.val[2]);
+                            l1 *= (pos.z/v1.z);
+                            l2 *= (pos.z/v2.z);
+                            l3 *= (pos.z/v3.z);
 
-                            float c = pos.val[2];
-                            vec3 foreground = { .val = { c, c, c }};
+                            float c = pos.z;
+                            vec3 foreground = {c, c, c };
 
                             dup_vec3(&foreground, buff->color + v*buff->width + u);
                         } else if (any_drawn) {
@@ -68,21 +68,22 @@ void rasterize(framebuffer_t *buff,
 
 float cp_magnitude(vec4 *a, vec4 *o, vec4 *b)
 {
-    return (a->val[0]-o->val[0])*(b->val[1]-o->val[1]) -
-           (b->val[0]-o->val[0])*(a->val[1]-o->val[1]);
+    return (a->x-o->x)*(b->y-o->y) - (b->x-o->x)*(a->y-o->y);
 }
 
 void w_normalize(vec4 *v)
 {
-    scale_vec3((vec3 *) v, 1/v->val[3]);
+    v->x /= v->w;
+    v->y /= v->w;
+    v->z /= v->w;
 }
 
 void reset_framebuffer(framebuffer_t *buff)
 {
     for(int i = 0; i < buff->width*buff->height; i++) {
-        (buff->color+i)->val[0] = 0;
-        (buff->color+i)->val[1] = 0;
-        (buff->color+i)->val[2] = 0;
+        (buff->color+i)->x = 0;
+        (buff->color+i)->y = 0;
+        (buff->color+i)->z = 0;
         buff->depth[i] = FLT_MAX;
     }
 }

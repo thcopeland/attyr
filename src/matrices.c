@@ -1,363 +1,271 @@
-#include <string.h>
 #include "matrices.h"
-
-void dup_vec2(vec2 *src, vec2 *dst)
-{
-    memcpy(dst->val, src->val, sizeof(float)*2);
-}
 
 void dup_vec3(vec3 *src, vec3 *dst)
 {
-    memcpy(dst->val, src->val, sizeof(float)*3);
+    *dst = *src;
 }
 
 void dup_vec4(vec4 *src, vec4 *dst)
 {
-    memcpy(dst->val, src->val, sizeof(float)*4);
-}
-
-void dup_mat2(mat2 *src, mat2 *dst)
-{
-    memcpy(dst->val, src->val, sizeof(float)*4);
+    *dst = *src;
 }
 
 void dup_mat3(mat3 *src, mat3 *dst)
 {
-    memcpy(dst->val, src->val, sizeof(float)*9);
+    *dst = *src;
 }
 
 void dup_mat4(mat4 *src, mat4 *dst)
 {
-    memcpy(dst->val, src->val, sizeof(float)*16);
-}
-
-void scale_vec2(vec2 *v, float s)
-{
-    v->val[0] *= s;
-    v->val[1] *= s;
+    *dst = *src;
 }
 
 void scale_vec3(vec3 *v, float s)
 {
-    v->val[0] *= s;
-    v->val[1] *= s;
-    v->val[2] *= s;
+    v->x *= s;
+    v->y *= s;
+    v->z *= s;
 }
 
 void scale_vec4(vec4 *v, float s)
 {
-    v->val[0] *= s;
-    v->val[1] *= s;
-    v->val[2] *= s;
-    v->val[3] *= s;
-}
-
-void scale_mat2(mat2 *m, float s)
-{
-    m->val[0] *= s;
-    m->val[1] *= s;
-    m->val[2] *= s;
-    m->val[3] *= s;
+    v->x *= s;
+    v->y *= s;
+    v->z *= s;
+    v->w *= s;
 }
 
 void scale_mat3(mat3 *m, float s)
 {
-    m->val[0] *= s;
-    m->val[1] *= s;
-    m->val[2] *= s;
-    m->val[3] *= s;
-    m->val[4] *= s;
-    m->val[5] *= s;
-    m->val[6] *= s;
-    m->val[7] *= s;
-    m->val[8] *= s;
+    m->m11 *= s;
+    m->m12 *= s;
+    m->m13 *= s;
+    m->m21 *= s;
+    m->m22 *= s;
+    m->m23 *= s;
+    m->m31 *= s;
+    m->m32 *= s;
+    m->m33 *= s;
 }
 
 void scale_mat4(mat4 *m, float s)
 {
-    m->val[0] *= s;
-    m->val[1] *= s;
-    m->val[2] *= s;
-    m->val[3] *= s;
-    m->val[4] *= s;
-    m->val[5] *= s;
-    m->val[6] *= s;
-    m->val[7] *= s;
-    m->val[8] *= s;
-    m->val[9] *= s;
-    m->val[10] *= s;
-    m->val[11] *= s;
-    m->val[12] *= s;
-    m->val[13] *= s;
-    m->val[14] *= s;
-    m->val[15] *= s;
-}
-
-void add_vec2(vec2 *a, vec2 *b, vec2 *c)
-{
-    c->val[0] = a->val[0] + b->val[0];
-    c->val[1] = a->val[1] + b->val[1];
+    m->m11 *= s;
+    m->m12 *= s;
+    m->m13 *= s;
+    m->m14 *= s;
+    m->m21 *= s;
+    m->m22 *= s;
+    m->m23 *= s;
+    m->m24 *= s;
+    m->m31 *= s;
+    m->m32 *= s;
+    m->m33 *= s;
+    m->m34 *= s;
+    m->m41 *= s;
+    m->m42 *= s;
+    m->m43 *= s;
+    m->m44 *= s;
 }
 
 void add_vec3(vec3 *a, vec3 *b, vec3 *c)
 {
-    c->val[0] = a->val[0] + b->val[0];
-    c->val[1] = a->val[1] + b->val[1];
-    c->val[2] = a->val[2] + b->val[2];
+    c->x = a->x + b->x;
+    c->y = a->y + b->y;
+    c->z = a->z + b->z;
 }
 
 void add_vec4(vec4 *a, vec4 *b, vec4 *c)
 {
-    c->val[0] = a->val[0] + b->val[0];
-    c->val[1] = a->val[1] + b->val[1];
-    c->val[2] = a->val[2] + b->val[2];
-    c->val[3] = a->val[3] + b->val[3];
-}
-
-void add_mat2(mat2 *a, mat2 *b, mat2 *c)
-{
-    c->val[0] = a->val[0] + b->val[0];
-    c->val[1] = a->val[1] + b->val[1];
-    c->val[2] = a->val[2] + b->val[2];
-    c->val[3] = a->val[3] + b->val[3];
+    c->x = a->x + b->x;
+    c->y = a->y + b->y;
+    c->z = a->z + b->z;
+    c->w = a->w + b->w;
 }
 
 void add_mat3(mat3 *a, mat3 *b, mat3 *c)
 {
-    c->val[0] = a->val[0] + b->val[0];
-    c->val[1] = a->val[1] + b->val[1];
-    c->val[2] = a->val[2] + b->val[2];
-    c->val[3] = a->val[3] + b->val[3];
-    c->val[4] = a->val[4] + b->val[4];
-    c->val[5] = a->val[5] + b->val[5];
-    c->val[6] = a->val[6] + b->val[6];
-    c->val[7] = a->val[7] + b->val[7];
-    c->val[8] = a->val[8] + b->val[8];
+    c->m11 = a->m11 + b->m11;
+    c->m12 = a->m12 + b->m12;
+    c->m13 = a->m13 + b->m13;
+    c->m21 = a->m21 + b->m21;
+    c->m22 = a->m22 + b->m22;
+    c->m23 = a->m23 + b->m23;
+    c->m31 = a->m31 + b->m31;
+    c->m32 = a->m32 + b->m32;
+    c->m33 = a->m33 + b->m33;
 }
 
 void add_mat4(mat4 *a, mat4 *b, mat4 *c)
 {
-    c->val[0] = a->val[0] + b->val[0];
-    c->val[1] = a->val[1] + b->val[1];
-    c->val[2] = a->val[2] + b->val[2];
-    c->val[3] = a->val[3] + b->val[3];
-    c->val[4] = a->val[4] + b->val[4];
-    c->val[5] = a->val[5] + b->val[5];
-    c->val[6] = a->val[6] + b->val[6];
-    c->val[7] = a->val[7] + b->val[7];
-    c->val[8] = a->val[8] + b->val[8];
-    c->val[9] = a->val[9] + b->val[9];
-    c->val[10] = a->val[10] + b->val[10];
-    c->val[11] = a->val[11] + b->val[11];
-    c->val[12] = a->val[12] + b->val[12];
-    c->val[13] = a->val[13] + b->val[13];
-    c->val[14] = a->val[14] + b->val[14];
-    c->val[15] = a->val[15] + b->val[15];
-}
-
-void sub_vec2(vec2 *a, vec2 *b, vec2 *c)
-{
-    c->val[0] = a->val[0] - b->val[0];
-    c->val[1] = a->val[1] - b->val[1];
+    c->m11 = a->m11 + b->m11;
+    c->m12 = a->m12 + b->m12;
+    c->m13 = a->m13 + b->m13;
+    c->m14 = a->m14 + b->m14;
+    c->m21 = a->m21 + b->m21;
+    c->m22 = a->m22 + b->m22;
+    c->m23 = a->m23 + b->m23;
+    c->m24 = a->m24 + b->m24;
+    c->m31 = a->m31 + b->m31;
+    c->m32 = a->m32 + b->m32;
+    c->m33 = a->m33 + b->m33;
+    c->m34 = a->m34 + b->m34;
+    c->m41 = a->m41 + b->m41;
+    c->m42 = a->m42 + b->m42;
+    c->m43 = a->m43 + b->m43;
+    c->m44 = a->m44 + b->m44;
 }
 
 void sub_vec3(vec3 *a, vec3 *b, vec3 *c)
 {
-    c->val[0] = a->val[0] - b->val[0];
-    c->val[1] = a->val[1] - b->val[1];
-    c->val[2] = a->val[2] - b->val[2];
+    c->x = a->x - b->x;
+    c->y = a->y - b->y;
+    c->z = a->z - b->z;
 }
 
 void sub_vec4(vec4 *a, vec4 *b, vec4 *c)
 {
-    c->val[0] = a->val[0] - b->val[0];
-    c->val[1] = a->val[1] - b->val[1];
-    c->val[2] = a->val[2] - b->val[2];
-    c->val[3] = a->val[3] - b->val[3];
-}
-
-void sub_mat2(mat2 *a, mat2 *b, mat2 *c)
-{
-    c->val[0] = a->val[0] - b->val[0];
-    c->val[1] = a->val[1] - b->val[1];
-    c->val[2] = a->val[2] - b->val[2];
-    c->val[3] = a->val[3] - b->val[3];
+    c->x = a->x - b->x;
+    c->y = a->y - b->y;
+    c->z = a->z - b->z;
+    c->w = a->w - b->w;
 }
 
 void sub_mat3(mat3 *a, mat3 *b, mat3 *c)
 {
-    c->val[0] = a->val[0] - b->val[0];
-    c->val[1] = a->val[1] - b->val[1];
-    c->val[2] = a->val[2] - b->val[2];
-    c->val[3] = a->val[3] - b->val[3];
-    c->val[4] = a->val[4] - b->val[4];
-    c->val[5] = a->val[5] - b->val[5];
-    c->val[6] = a->val[6] - b->val[6];
-    c->val[7] = a->val[7] - b->val[7];
-    c->val[8] = a->val[8] - b->val[8];
+    c->m11 = a->m11 - b->m11;
+    c->m12 = a->m12 - b->m12;
+    c->m13 = a->m13 - b->m13;
+    c->m21 = a->m21 - b->m21;
+    c->m22 = a->m22 - b->m22;
+    c->m23 = a->m23 - b->m23;
+    c->m31 = a->m31 - b->m31;
+    c->m32 = a->m32 - b->m32;
+    c->m33 = a->m33 - b->m33;
 }
 
 void sub_mat4(mat4 *a, mat4 *b, mat4 *c)
 {
-    c->val[0] = a->val[0] - b->val[0];
-    c->val[1] = a->val[1] - b->val[1];
-    c->val[2] = a->val[2] - b->val[2];
-    c->val[3] = a->val[3] - b->val[3];
-    c->val[4] = a->val[4] - b->val[4];
-    c->val[5] = a->val[5] - b->val[5];
-    c->val[6] = a->val[6] - b->val[6];
-    c->val[7] = a->val[7] - b->val[7];
-    c->val[8] = a->val[8] - b->val[8];
-    c->val[9] = a->val[9] - b->val[9];
-    c->val[10] = a->val[10] - b->val[10];
-    c->val[11] = a->val[11] - b->val[11];
-    c->val[12] = a->val[12] - b->val[12];
-    c->val[13] = a->val[13] - b->val[13];
-    c->val[14] = a->val[14] - b->val[14];
-    c->val[15] = a->val[15] - b->val[15];
-}
-
-void had_vec2(vec2 *a, vec2 *b, vec2 *c)
-{
-    c->val[0] = a->val[0] * b->val[0];
-    c->val[1] = a->val[1] * b->val[1];
+    c->m11 = a->m11 - b->m11;
+    c->m12 = a->m12 - b->m12;
+    c->m13 = a->m13 - b->m13;
+    c->m14 = a->m14 - b->m14;
+    c->m21 = a->m21 - b->m21;
+    c->m22 = a->m22 - b->m22;
+    c->m23 = a->m23 - b->m23;
+    c->m24 = a->m24 - b->m24;
+    c->m31 = a->m31 - b->m31;
+    c->m32 = a->m32 - b->m32;
+    c->m33 = a->m33 - b->m33;
+    c->m34 = a->m34 - b->m34;
+    c->m41 = a->m41 - b->m41;
+    c->m42 = a->m42 - b->m42;
+    c->m43 = a->m43 - b->m43;
+    c->m44 = a->m44 - b->m44;
 }
 
 void had_vec3(vec3 *a, vec3 *b, vec3 *c)
 {
-    c->val[0] = a->val[0] * b->val[0];
-    c->val[1] = a->val[1] * b->val[1];
-    c->val[2] = a->val[2] * b->val[2];
+    c->x = a->x * b->x;
+    c->y = a->y * b->y;
+    c->z = a->z * b->z;
 }
 
 void had_vec4(vec4 *a, vec4 *b, vec4 *c)
 {
-    c->val[0] = a->val[0] * b->val[0];
-    c->val[1] = a->val[1] * b->val[1];
-    c->val[2] = a->val[2] * b->val[2];
-    c->val[3] = a->val[3] * b->val[3];
-}
-
-void had_mat2(mat2 *a, mat2 *b, mat2 *c)
-{
-    c->val[0] = a->val[0] * b->val[0];
-    c->val[1] = a->val[1] * b->val[1];
-    c->val[2] = a->val[2] * b->val[2];
-    c->val[3] = a->val[3] * b->val[3];
+    c->x = a->x * b->x;
+    c->y = a->y * b->y;
+    c->z = a->z * b->z;
+    c->w = a->w * b->w;
 }
 
 void had_mat3(mat3 *a, mat3 *b, mat3 *c)
 {
-    c->val[0] = a->val[0] * b->val[0];
-    c->val[1] = a->val[1] * b->val[1];
-    c->val[2] = a->val[2] * b->val[2];
-    c->val[3] = a->val[3] * b->val[3];
-    c->val[4] = a->val[4] * b->val[4];
-    c->val[5] = a->val[5] * b->val[5];
-    c->val[6] = a->val[6] * b->val[6];
-    c->val[7] = a->val[7] * b->val[7];
-    c->val[8] = a->val[8] * b->val[8];
+    c->m11 = a->m11 * b->m11;
+    c->m12 = a->m12 * b->m12;
+    c->m13 = a->m13 * b->m13;
+    c->m21 = a->m21 * b->m21;
+    c->m22 = a->m22 * b->m22;
+    c->m23 = a->m23 * b->m23;
+    c->m31 = a->m31 * b->m31;
+    c->m32 = a->m32 * b->m32;
+    c->m33 = a->m33 * b->m33;
 }
 
 void had_mat4(mat4 *a, mat4 *b, mat4 *c)
 {
-    c->val[0] = a->val[0] * b->val[0];
-    c->val[1] = a->val[1] * b->val[1];
-    c->val[2] = a->val[2] * b->val[2];
-    c->val[3] = a->val[3] * b->val[3];
-    c->val[4] = a->val[4] * b->val[4];
-    c->val[5] = a->val[5] * b->val[5];
-    c->val[6] = a->val[6] * b->val[6];
-    c->val[7] = a->val[7] * b->val[7];
-    c->val[8] = a->val[8] * b->val[8];
-    c->val[9] = a->val[9] * b->val[9];
-    c->val[10] = a->val[10] * b->val[10];
-    c->val[11] = a->val[11] * b->val[11];
-    c->val[12] = a->val[12] * b->val[12];
-    c->val[13] = a->val[13] * b->val[13];
-    c->val[14] = a->val[14] * b->val[14];
-    c->val[15] = a->val[15] * b->val[15];
-}
-
-float dot_vec2(vec2 *a, vec2 *b)
-{
-    return a->val[0] * b->val[0] +
-           a->val[1] * b->val[1];
+    c->m11 = a->m11 * b->m11;
+    c->m12 = a->m12 * b->m12;
+    c->m13 = a->m13 * b->m13;
+    c->m14 = a->m14 * b->m14;
+    c->m21 = a->m21 * b->m21;
+    c->m22 = a->m22 * b->m22;
+    c->m23 = a->m23 * b->m23;
+    c->m24 = a->m24 * b->m24;
+    c->m31 = a->m31 * b->m31;
+    c->m32 = a->m32 * b->m32;
+    c->m33 = a->m33 * b->m33;
+    c->m34 = a->m34 * b->m34;
+    c->m41 = a->m41 * b->m41;
+    c->m42 = a->m42 * b->m42;
+    c->m43 = a->m43 * b->m43;
+    c->m44 = a->m44 * b->m44;
 }
 
 float dot_vec3(vec3 *a, vec3 *b)
 {
-    return a->val[0] * b->val[0] +
-           a->val[1] * b->val[1] +
-           a->val[2] * b->val[2];
+    return a->x*b->x + a->y*b->y + a->z*b->z;
 }
 
 float dot_vec4(vec4 *a, vec4 *b)
 {
-    return a->val[0] * b->val[0] +
-           a->val[1] * b->val[1] +
-           a->val[2] * b->val[2] +
-           a->val[3] * b->val[3];
-}
-
-void dot_mat2(mat2 *a, mat2 *b, mat2 *c)
-{
-    c->val[ 0] = a->val[ 0]*b->val[ 0] + a->val[ 1]*b->val[ 2];
-    c->val[ 1] = a->val[ 0]*b->val[ 1] + a->val[ 1]*b->val[ 3];
-    c->val[ 2] = a->val[ 2]*b->val[ 0] + a->val[ 3]*b->val[ 2];
-    c->val[ 3] = a->val[ 2]*b->val[ 1] + a->val[ 3]*b->val[ 3];
-}
-
-void dot_mat2vec2(mat2 *m, vec2 *v, vec2 *c)
-{
-    c->val[0] = m->val[ 0]*v->val[0] + m->val[ 1]*v->val[1];
-    c->val[1] = m->val[ 2]*v->val[0] + m->val[ 3]*v->val[1];
+    return a->x*b->x + a->y*b->y + a->z*b->z + a->w*b->w;
 }
 
 void dot_mat3(mat3 *a, mat3 *b, mat3 *c)
 {
-    c->val[ 0] = a->val[ 0]*b->val[ 0] + a->val[ 1]*b->val[ 3] + a->val[ 2]*b->val[ 6];
-    c->val[ 1] = a->val[ 0]*b->val[ 1] + a->val[ 1]*b->val[ 4] + a->val[ 2]*b->val[ 7];
-    c->val[ 2] = a->val[ 0]*b->val[ 2] + a->val[ 1]*b->val[ 5] + a->val[ 2]*b->val[ 8];
-    c->val[ 3] = a->val[ 3]*b->val[ 0] + a->val[ 4]*b->val[ 3] + a->val[ 5]*b->val[ 6];
-    c->val[ 4] = a->val[ 3]*b->val[ 1] + a->val[ 4]*b->val[ 4] + a->val[ 5]*b->val[ 7];
-    c->val[ 5] = a->val[ 3]*b->val[ 2] + a->val[ 4]*b->val[ 5] + a->val[ 5]*b->val[ 8];
-    c->val[ 6] = a->val[ 6]*b->val[ 0] + a->val[ 7]*b->val[ 3] + a->val[ 8]*b->val[ 6];
-    c->val[ 7] = a->val[ 6]*b->val[ 1] + a->val[ 7]*b->val[ 4] + a->val[ 8]*b->val[ 7];
-    c->val[ 8] = a->val[ 6]*b->val[ 2] + a->val[ 7]*b->val[ 5] + a->val[ 8]*b->val[ 8];
+    c->m11 = a->m11*b->m11 + a->m12*b->m21 + a->m13*b->m31;
+    c->m12 = a->m11*b->m12 + a->m12*b->m22 + a->m13*b->m32;
+    c->m13 = a->m11*b->m13 + a->m12*b->m23 + a->m13*b->m33;
+    c->m21 = a->m21*b->m11 + a->m22*b->m21 + a->m23*b->m31;
+    c->m22 = a->m21*b->m12 + a->m22*b->m22 + a->m23*b->m32;
+    c->m23 = a->m21*b->m13 + a->m22*b->m23 + a->m23*b->m33;
+    c->m31 = a->m31*b->m11 + a->m32*b->m21 + a->m33*b->m31;
+    c->m32 = a->m31*b->m12 + a->m32*b->m22 + a->m33*b->m32;
+    c->m33 = a->m31*b->m13 + a->m32*b->m23 + a->m33*b->m33;
 }
 
 void dot_mat3vec3(mat3 *m, vec3 *v, vec3 *c)
 {
-    c->val[0] = m->val[ 0]*v->val[0] + m->val[ 1]*v->val[1] + m->val[ 2]*v->val[2];
-    c->val[1] = m->val[ 3]*v->val[0] + m->val[ 4]*v->val[1] + m->val[ 5]*v->val[2];
-    c->val[2] = m->val[ 6]*v->val[0] + m->val[ 7]*v->val[1] + m->val[ 8]*v->val[2];
+    c->x = m->m11*v->x + m->m12*v->y + m->m13*v->z;
+    c->y = m->m21*v->x + m->m22*v->y + m->m23*v->z;
+    c->z = m->m31*v->x + m->m32*v->y + m->m33*v->z;
 }
 
 void dot_mat4(mat4 *a, mat4 *b, mat4 *c)
 {
-    c->val[ 0] = a->val[ 0]*b->val[ 0] + a->val[ 1]*b->val[ 4] + a->val[ 2]*b->val[ 8] + a->val[ 3]*b->val[12];
-    c->val[ 1] = a->val[ 0]*b->val[ 1] + a->val[ 1]*b->val[ 5] + a->val[ 2]*b->val[ 9] + a->val[ 3]*b->val[13];
-    c->val[ 2] = a->val[ 0]*b->val[ 2] + a->val[ 1]*b->val[ 6] + a->val[ 2]*b->val[10] + a->val[ 3]*b->val[14];
-    c->val[ 3] = a->val[ 0]*b->val[ 3] + a->val[ 1]*b->val[ 7] + a->val[ 2]*b->val[11] + a->val[ 3]*b->val[15];
-    c->val[ 4] = a->val[ 4]*b->val[ 0] + a->val[ 5]*b->val[ 4] + a->val[ 6]*b->val[ 8] + a->val[ 7]*b->val[12];
-    c->val[ 5] = a->val[ 4]*b->val[ 1] + a->val[ 5]*b->val[ 5] + a->val[ 6]*b->val[ 9] + a->val[ 7]*b->val[13];
-    c->val[ 6] = a->val[ 4]*b->val[ 2] + a->val[ 5]*b->val[ 6] + a->val[ 6]*b->val[10] + a->val[ 7]*b->val[14];
-    c->val[ 7] = a->val[ 4]*b->val[ 3] + a->val[ 5]*b->val[ 7] + a->val[ 6]*b->val[11] + a->val[ 7]*b->val[15];
-    c->val[ 8] = a->val[ 8]*b->val[ 0] + a->val[ 9]*b->val[ 4] + a->val[10]*b->val[ 8] + a->val[11]*b->val[12];
-    c->val[ 9] = a->val[ 8]*b->val[ 1] + a->val[ 9]*b->val[ 5] + a->val[10]*b->val[ 9] + a->val[11]*b->val[13];
-    c->val[10] = a->val[ 8]*b->val[ 2] + a->val[ 9]*b->val[ 6] + a->val[10]*b->val[10] + a->val[11]*b->val[14];
-    c->val[11] = a->val[ 8]*b->val[ 3] + a->val[ 9]*b->val[ 7] + a->val[10]*b->val[11] + a->val[11]*b->val[15];
-    c->val[12] = a->val[12]*b->val[ 0] + a->val[13]*b->val[ 4] + a->val[14]*b->val[ 8] + a->val[15]*b->val[12];
-    c->val[13] = a->val[12]*b->val[ 1] + a->val[13]*b->val[ 5] + a->val[14]*b->val[ 9] + a->val[15]*b->val[13];
-    c->val[14] = a->val[12]*b->val[ 2] + a->val[13]*b->val[ 6] + a->val[14]*b->val[10] + a->val[15]*b->val[14];
-    c->val[15] = a->val[12]*b->val[ 3] + a->val[13]*b->val[ 7] + a->val[14]*b->val[11] + a->val[15]*b->val[15];
+    c->m11 = a->m11*b->m11 + a->m12*b->m21 + a->m13*b->m31 + a->m14*b->m41;
+    c->m12 = a->m11*b->m12 + a->m12*b->m22 + a->m13*b->m32 + a->m14*b->m42;
+    c->m13 = a->m11*b->m13 + a->m12*b->m23 + a->m13*b->m33 + a->m14*b->m43;
+    c->m14 = a->m11*b->m14 + a->m12*b->m24 + a->m13*b->m34 + a->m14*b->m44;
+    c->m21 = a->m21*b->m11 + a->m22*b->m21 + a->m23*b->m31 + a->m24*b->m41;
+    c->m22 = a->m21*b->m12 + a->m22*b->m22 + a->m23*b->m32 + a->m24*b->m42;
+    c->m23 = a->m21*b->m13 + a->m22*b->m23 + a->m23*b->m33 + a->m24*b->m43;
+    c->m24 = a->m21*b->m14 + a->m22*b->m24 + a->m23*b->m34 + a->m24*b->m44;
+    c->m31 = a->m31*b->m11 + a->m32*b->m21 + a->m33*b->m31 + a->m34*b->m41;
+    c->m32 = a->m31*b->m12 + a->m32*b->m22 + a->m33*b->m32 + a->m34*b->m42;
+    c->m33 = a->m31*b->m13 + a->m32*b->m23 + a->m33*b->m33 + a->m34*b->m43;
+    c->m34 = a->m31*b->m14 + a->m32*b->m24 + a->m33*b->m34 + a->m34*b->m44;
+    c->m41 = a->m41*b->m11 + a->m42*b->m21 + a->m43*b->m31 + a->m44*b->m41;
+    c->m42 = a->m41*b->m12 + a->m42*b->m22 + a->m43*b->m32 + a->m44*b->m42;
+    c->m43 = a->m41*b->m13 + a->m42*b->m23 + a->m43*b->m33 + a->m44*b->m43;
+    c->m44 = a->m41*b->m14 + a->m42*b->m24 + a->m43*b->m34 + a->m44*b->m44;
 }
 
 void dot_mat4vec4(mat4 *m, vec4 *v, vec4 *c)
 {
-    c->val[0] = m->val[ 0]*v->val[0] + m->val[ 1]*v->val[1] + m->val[ 2]*v->val[2] + m->val[ 3]*v->val[3];
-    c->val[1] = m->val[ 4]*v->val[0] + m->val[ 5]*v->val[1] + m->val[ 6]*v->val[2] + m->val[ 7]*v->val[3];
-    c->val[2] = m->val[ 8]*v->val[0] + m->val[ 9]*v->val[1] + m->val[10]*v->val[2] + m->val[11]*v->val[3];
-    c->val[3] = m->val[12]*v->val[0] + m->val[13]*v->val[1] + m->val[14]*v->val[2] + m->val[15]*v->val[3];
+    c->x = m->m11*v->x + m->m12*v->y + m->m13*v->z + m->m14*v->w;
+    c->y = m->m21*v->x + m->m22*v->y + m->m23*v->z + m->m24*v->w;
+    c->z = m->m31*v->x + m->m32*v->y + m->m33*v->z + m->m34*v->w;
+    c->w = m->m41*v->x + m->m42*v->y + m->m43*v->z + m->m44*v->w;
 }

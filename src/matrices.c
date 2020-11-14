@@ -269,3 +269,27 @@ void dot_mat4vec4(mat4 *m, vec4 *v, vec4 *c)
     c->z = m->m31*v->x + m->m32*v->y + m->m33*v->z + m->m34*v->w;
     c->w = m->m41*v->x + m->m42*v->y + m->m43*v->z + m->m44*v->w;
 }
+
+float invert_mat3(mat3 *m)
+{
+    float a = m->m22*m->m33 - m->m23*m->m32,
+          b = m->m23*m->m31 - m->m21*m->m33,
+          c = m->m21*m->m32 - m->m22*m->m31,
+          d = m->m13*m->m32 - m->m12*m->m33,
+          e = m->m11*m->m33 - m->m13*m->m31,
+          f = m->m12*m->m31 - m->m11*m->m32,
+          g = m->m12*m->m23 - m->m13*m->m22,
+          h = m->m13*m->m21 - m->m11*m->m23,
+          i = m->m11*m->m22 - m->m12*m->m21,
+          det = m->m11*a + m->m12*b + m->m13*c;
+
+    if (fabs(det) > MAT_INV_EPSILON) {
+        float s = 1/det;
+
+        m->m11 = s*a; m->m12 = s*d; m->m13 = s*g;
+        m->m21 = s*b; m->m22 = s*e; m->m23 = s*h;
+        m->m31 = s*c; m->m32 = s*f; m->m33 = s*i;
+    }
+
+    return det;
+}

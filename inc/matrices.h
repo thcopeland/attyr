@@ -1,6 +1,10 @@
 #ifndef MATRICES_H
 #define MATRICES_H
 
+#ifndef MAT_INV_EPSILON
+#define MAT_INV_EPSILON 0.000001
+#endif
+
 typedef struct {
     float x, y, z;
 } vec3;
@@ -75,5 +79,10 @@ void dot_mat3(mat3 *a, mat3 *b, mat3 *c);
 void dot_mat4(mat4 *a, mat4 *b, mat4 *c);
 void dot_mat3vec3(mat3 *a, vec3 *b, vec3 *c);
 void dot_mat4vec4(mat4 *a, vec4 *b, vec4 *c);
+
+/*
+ * Invert the given 3x3 matrix, if possible, and return the determinant.
+ */
+float invert_mat3(mat3 *m);
 
 #endif

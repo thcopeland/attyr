@@ -253,6 +253,20 @@ void test_dot_product_mat4vec4(void)
     assert_vec4_eq(c, exp, "mat4 * vec4 dot product");
 }
 
+void test_invert_mat3(void)
+{
+    mat3 a = { 5,6,7,1,2,3,8,9,0 },
+         v = a,
+         d,
+         s = { 0,0,0,0,0,0,0,0,0 },
+         i = { 1,0,0,0,1,0,0,0,1 };
+
+    assert_float_eq(invert_mat3(&v), -40, "mat3 inverse determinant");
+    dot_mat3(&a, &v, &d);
+    assert_mat3_eq(d, i, "mat3 inverse check");
+    assert_float_eq(invert_mat3(&s), 0, "mat3 inverse determinant");
+}
+
 void test_matrices(void) {
     test_duplication_vec3();
     test_duplication_vec4();
@@ -287,4 +301,6 @@ void test_matrices(void) {
 
     test_dot_product_mat3vec3();
     test_dot_product_mat4vec4();
+
+    test_invert_mat3();
 }

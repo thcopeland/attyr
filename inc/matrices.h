@@ -2,7 +2,7 @@
 #define MATRICES_H
 
 #ifndef MAT_INV_EPSILON
-#define MAT_INV_EPSILON 0.000001
+#define MAT_INV_EPSILON 0.0001
 #endif
 
 typedef struct {
@@ -25,6 +25,12 @@ typedef struct {
           m31, m32, m33, m34,
           m41, m42, m43, m44;
 } mat4;
+
+/*
+ * Initialize the entries in a vector.
+ */
+void init_vec3(vec3 *v, float x, float y, float z);
+void init_vec4(vec4 *v, float x, float y, float z, float w);
 
 /*
  * Copy the contents of src into dst.

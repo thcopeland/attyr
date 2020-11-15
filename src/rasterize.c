@@ -2,11 +2,8 @@
 #include <math.h>
 #include "rasterize.h"
 
-#define max2(a, b) ((a) > (b) ? (a) : (b))
-#define min2(a, b) ((a) < (b) ? (a) : (b))
-#define max3(a, b, c) max2(max2(a, b), c)
-#define min3(a, b, c) min2(min2(a, b), c)
-#define clamp(min, max, x) (((x)<(min)) ? (min) : ((x)>(max))?(max):(x))
+#define max3(a, b, c) fmax(fmax(a, b), c)
+#define min3(a, b, c) fmin(fmin(a, b), c)
 
 void rasterize(framebuffer_t *buff,
               vertex_shader_f vert_shader,
@@ -14,68 +11,57 @@ void rasterize(framebuffer_t *buff,
               void *shader_data)
 {
     void *shared;
-    vec4 v1, v2, v3, pos;
+    vec4 v1, v2, v3;
+
     while (vert_shader(&v1, &v2, &v3, shader_data, &shared)) {
-        w_normalize(&v1);
-        w_normalize(&v2);
-        w_normalize(&v3);
+        vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos = { 0, 0, 1 };
+        mat3 matrix = {
+            v1.x, v2.x, v3.x,
+            v1.y, v2.y, v3.y,
+            v1.w, v2.w, v3.w
+        };
 
-        float l1, l2, l3, area = fabs(cp_magnitude(&v1, &v2, &v3));
-        int max_u = clamp(0, buff->width, (max3(v1.x, v2.x, v3.x)+1)*buff->width/2+1),
-            max_v = clamp(0, buff->height,(max3(v1.y, v2.y, v3.y)+1)*buff->height/2+1),
-            min_u = clamp(0, buff->width, (min3(v1.x, v2.x, v3.x)+1)*buff->width/2),
-            min_z = min3(v1.z, v2.z, v3.z),
-            v     = clamp(0, buff->height, (min3(v1.y, v2.y, v3.y)+1)*buff->height/2),
-            u;
+        /* drop back-facing and very small faces */
+        if (invert_mat3(&matrix) <= 0) continue;
 
-        if (min_z <= 1) {
-            for (; v<max_v; v++) {
-                for (u=min_u; u<max_u; u++) {
-                    int any_drawn = 0;
-                    pos.y = (float) 2*v/buff->height-1;
-                    pos.x = (float) 2*u/buff->width-1;
+        int min_i = to_screen_space(min3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, -1),
+            max_i = to_screen_space(max3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, 1),
+            min_j = to_screen_space(min3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, -1),
+            max_j = to_screen_space(max3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, 1);
 
-                    if ((l1=cp_magnitude(&pos, &v3, &v2)) >= 0 &&
-                        (l2=cp_magnitude(&pos, &v1, &v3)) >= 0 &&
-                        (l3=cp_magnitude(&pos, &v2, &v1)) >= 0) {
-                        l1 /= area;
-                        l2 /= area;
-                        l3 /= area;
+        init_vec3(&l1_coeff, matrix.m11, matrix.m12, matrix.m13);
+        init_vec3(&l2_coeff, matrix.m21, matrix.m22, matrix.m23);
+        init_vec3(&l3_coeff, matrix.m31, matrix.m32, matrix.m33);
+        init_vec3(&w_coeff,  matrix.m11+matrix.m21+matrix.m31,
+                             matrix.m12+matrix.m22+matrix.m32,
+                             matrix.m13+matrix.m23+matrix.m33);
 
-                        pos.z = 1/(l1/v1.z + l2/v2.z + l3/v3.z);
+        for(int i = min_i; i < max_i; i++) {
+            pos.y = (float) 2*i/buff->height - 1;
 
-                        if (pos.z > 0 && pos.z < buff->depth[v*buff->width + u]) {
-                            any_drawn = 1;
-                            buff->depth[v*buff->width + u] = pos.z;
+            for (int j = min_j; j < max_j; j++) {
+                pos.x = (float) 2*j/buff->width - 1;
 
-                            l1 *= (pos.z/v1.z);
-                            l2 *= (pos.z/v2.z);
-                            l3 *= (pos.z/v3.z);
+                float l1, l2, l3, w = 1/dot_vec3(&pos, &w_coeff);
 
-                            float c = pos.z;
-                            vec3 foreground = {c, c, c };
+                if (w >= 0 && w < buff->depth[i * buff->width + j] &&
+                    (l1=w*dot_vec3(&pos, &l1_coeff)) >= 0 &&
+                    (l2=w*dot_vec3(&pos, &l2_coeff)) >= 0 &&
+                    (l3=w*dot_vec3(&pos, &l3_coeff)) >= 0) {
+                    vec3 foreground = { w/3, w/3, w/3 };
 
-                            dup_vec3(&foreground, buff->color + v*buff->width + u);
-                        } else if (any_drawn) {
-                            continue;
-                        }
-                    }
+                    buff->depth[i * buff->width + j] = w;
+
+                    dup_vec3(&foreground, buff->color + i * buff->width + j);
                 }
             }
         }
     }
 }
 
-float cp_magnitude(vec4 *a, vec4 *o, vec4 *b)
+int to_screen_space(float z, int scale, int bias)
 {
-    return (a->x-o->x)*(b->y-o->y) - (b->x-o->x)*(a->y-o->y);
-}
-
-void w_normalize(vec4 *v)
-{
-    v->x /= v->w;
-    v->y /= v->w;
-    v->z /= v->w;
+    return fmax(fmin(scale*(z+1)/2 + bias, scale), 0);
 }
 
 void reset_framebuffer(framebuffer_t *buff)

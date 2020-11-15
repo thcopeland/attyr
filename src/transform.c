@@ -1,5 +1,9 @@
 #include "transform.h"
 
+/*
+ * REWRITE! this is the OpenGL perspective matrix. we should use a different one
+ * for the Olano-Greer algorithm
+ */
 void perspective_transform(mat4 *matrix,
                            float left,
                            float right,

@@ -1,4 +1,20 @@
 #include "matrices.h"
+#include <math.h> /* fabs */
+
+void init_vec3(vec3 *v, float x, float y, float z)
+{
+    v->x = x;
+    v->y = y;
+    v->z = z;
+}
+
+void init_vec4(vec4 *v, float x, float y, float z, float w)
+{
+    v->x = x;
+    v->y = y;
+    v->z = z;
+    v->w = w;
+}
 
 void dup_vec3(vec3 *src, vec3 *dst)
 {
@@ -289,7 +305,9 @@ float invert_mat3(mat3 *m)
         m->m11 = s*a; m->m12 = s*d; m->m13 = s*g;
         m->m21 = s*b; m->m22 = s*e; m->m23 = s*h;
         m->m31 = s*c; m->m32 = s*f; m->m33 = s*i;
+
+        return det;
     }
 
-    return det;
+    return 0;
 }

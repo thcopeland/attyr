@@ -1488,13 +1488,18 @@ int tris[] = {
 
 int len = sizeof(tris)/sizeof(int);
 
-int vert_shader(vec4 *vert1, vec4 *vert2, vec4 *vert3, void *perspective, void **to_fragment)
+int vert_shader(vec4 *vert1, vec4 *vert2, vec4 *vert3, void *data, void **shared)
 {
     static int i;
 
-    if (i < 200*len) {
-        float a = 0.05 * (i/len);
-        mat4 combined, rotate = {
+    if (i < 400*len) {
+        float a = 0.02 * (i/len);
+        mat4 combined, perspective = {
+            1, 0, 0, 0,
+            0, 0.9, 0, 0,
+            0, 0, 1, 0,
+            0, 0, -1, 0
+        }, rotate = {
             cos(a), 0, sin(a), 0,
               0,    1,   0,    0,
             -sin(a),0, cos(a), 0,
@@ -1502,11 +1507,11 @@ int vert_shader(vec4 *vert1, vec4 *vert2, vec4 *vert3, void *perspective, void *
         }, translate = {
             1, 0, 0, 0,
             0, 1, 0, 0,
-            0, 0, 1, -2.1,
+            0, 0, 1, -2.1+0.1*a,
             0, 0, 0, 1
         }, transform;
         dot_mat4(&translate, &rotate, &transform);
-        dot_mat4(perspective, &transform, &combined);
+        dot_mat4(&perspective, &transform, &combined);
 
         dot_mat4vec4(&combined, verts+tris[3*i % len]-1, vert1);
         dot_mat4vec4(&combined, verts+tris[(3*i+1) % len]-1, vert2);
@@ -1538,23 +1543,21 @@ void render(framebuffer_t *buff)
 }
 
 int main(int argc, char **argv) {
-    mat4 perspective;
-    perspective_transform(&perspective, -0.4, 0.4, -0.2, 0.2, 0.3, 6);
-
-    vec3 color_buffer[10508];
-    float depth_buffer[10508];
+    static int width = 140, height = 72;
+    vec3 color_buffer[width*height];
+    float depth_buffer[width*height];
     framebuffer_t buff = {
         .color = color_buffer,
         .depth = depth_buffer,
-        .width = 142,
-        .height = 72
+        .width = width,
+        .height = height
     };
 
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 400; i++) {
         reset_framebuffer(&buff);
-        rasterize(&buff, vert_shader, frag_shader, &perspective);
+        rasterize(&buff, vert_shader, frag_shader, NULL);
         render(&buff);
-        usleep(10000);
+        usleep(5000);
     }
 
     return 0;

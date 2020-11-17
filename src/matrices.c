@@ -299,7 +299,7 @@ float invert_mat3(mat3 *m)
           i = m->m11*m->m22 - m->m12*m->m21,
           det = m->m11*a + m->m12*b + m->m13*c;
 
-    if (fabs(det) > MAT_INV_EPSILON) {
+    if (fabs(det) >= MAT_INV_EPSILON) {
         float s = 1/det;
 
         m->m11 = s*a; m->m12 = s*d; m->m13 = s*g;

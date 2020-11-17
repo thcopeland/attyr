@@ -2,7 +2,7 @@
 #define MATRICES_H
 
 #ifndef MAT_INV_EPSILON
-#define MAT_INV_EPSILON 0.0001
+#define MAT_INV_EPSILON 0.000001
 #endif
 
 typedef struct {

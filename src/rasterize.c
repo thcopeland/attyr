@@ -2,8 +2,6 @@
 #include <math.h>
 #include "rasterize.h"
 
-#define EDGE_EPSILON 0.01
-
 #define max3(a, b, c) fmax(fmax(a, b), c)
 #define min3(a, b, c) fmin(fmin(a, b), c)
 
@@ -47,9 +45,9 @@ void rasterize(framebuffer_t *buff,
                 float l1, l2, l3, w = 1/semi_dot(&pos, &w_coeff);
 
                 if (w >= 0 && w < buff->depth[i * buff->width + j] &&
-                    (l1=w*semi_dot(&pos, &l1_coeff)) >= -EDGE_EPSILON &&
-                    (l2=w*semi_dot(&pos, &l2_coeff)) >= -EDGE_EPSILON &&
-                    (l3=w*semi_dot(&pos, &l3_coeff)) >= -EDGE_EPSILON) {
+                    (l1=w*semi_dot(&pos, &l1_coeff)) >= 0 &&
+                    (l2=w*semi_dot(&pos, &l2_coeff)) >= 0 &&
+                    (l3=w*semi_dot(&pos, &l3_coeff)) >= 0) {
                     vec3 foreground = { 1-w/3, 1-w/3, 1-w/3 };
 
                     buff->depth[i * buff->width + j] = w;

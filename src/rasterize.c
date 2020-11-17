@@ -2,6 +2,8 @@
 #include <math.h>
 #include "rasterize.h"
 
+#define EDGE_EPSILON 0.01
+
 #define max3(a, b, c) fmax(fmax(a, b), c)
 #define min3(a, b, c) fmin(fmin(a, b), c)
 
@@ -14,7 +16,7 @@ void rasterize(framebuffer_t *buff,
     vec4 v1, v2, v3;
 
     while (vert_shader(&v1, &v2, &v3, shader_data, &shared)) {
-        vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos = { 0, 0, 1 };
+        vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos;
         mat3 matrix = {
             v1.x, v2.x, v3.x,
             v1.y, v2.y, v3.y,
@@ -42,12 +44,12 @@ void rasterize(framebuffer_t *buff,
             for (int j = min_j; j < max_j; j++) {
                 pos.x = (float) 2*j/buff->width - 1;
 
-                float l1, l2, l3, w = 1/dot_vec3(&pos, &w_coeff);
+                float l1, l2, l3, w = 1/semi_dot(&pos, &w_coeff);
 
                 if (w >= 0 && w < buff->depth[i * buff->width + j] &&
-                    (l1=w*dot_vec3(&pos, &l1_coeff)) >= 0 &&
-                    (l2=w*dot_vec3(&pos, &l2_coeff)) >= 0 &&
-                    (l3=w*dot_vec3(&pos, &l3_coeff)) >= 0) {
+                    (l1=w*semi_dot(&pos, &l1_coeff)) >= -EDGE_EPSILON &&
+                    (l2=w*semi_dot(&pos, &l2_coeff)) >= -EDGE_EPSILON &&
+                    (l3=w*semi_dot(&pos, &l3_coeff)) >= -EDGE_EPSILON) {
                     vec3 foreground = { 1-w/3, 1-w/3, 1-w/3 };
 
                     buff->depth[i * buff->width + j] = w;
@@ -57,6 +59,11 @@ void rasterize(framebuffer_t *buff,
             }
         }
     }
+}
+
+float semi_dot(vec3 *x, vec3 *coeff)
+{
+    return x->x*coeff->x + x->y*coeff->y + coeff->z;
 }
 
 int to_screen_space(float z, int scale, int bias)

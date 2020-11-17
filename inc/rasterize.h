@@ -27,6 +27,8 @@ void rasterize(framebuffer_t *buffer,
               fragment_shader_f frag_shader,
               void *shader_data);
 
+float semi_dot(vec3 *x, vec3 *coeff);
+
 int to_screen_space(float z, int scale, int bias);
 
 void reset_framebuffer(framebuffer_t *buff);

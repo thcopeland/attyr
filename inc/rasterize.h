@@ -14,13 +14,13 @@ typedef int (*vertex_shader_f)(vec4 *vert1,
                                vec4 *vert2,
                                vec4 *vert3,
                                void *data,
-                               void **to_fragment);
+                               void **shared);
 
-typedef void (*fragment_shader_f)(vec3 *rgb,
-                                  vec3 *location,
+typedef void (*fragment_shader_f)(vec4 *color,
                                   vec3 *coords,
+                                  float depth,
                                   void *data,
-                                  void *from_vertex);
+                                  void *shared);
 
 void rasterize(framebuffer_t *buffer,
               vertex_shader_f vert_shader,

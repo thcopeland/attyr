@@ -9,7 +9,7 @@ TEST_BIN=run_tests
 LIBS=-lm
 CFLAGS=-I$(INC_DIR) -flto -O3 -Wall
 
-_MAIN_OBJ=matrices.o rasterize.o main.o transform.o
+_MAIN_OBJ=matrices.o rasterize.o main.o transform.o render.o
 MAIN_OBJ=$(patsubst %,$(OBJ_DIR)/%,$(_MAIN_OBJ))
 
 _TEST_OBJ=test_matrices.o test_helpers.o test_main.o

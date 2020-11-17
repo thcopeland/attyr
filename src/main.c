@@ -4,6 +4,7 @@
 #include "matrices.h"
 #include "transform.h"
 #include "rasterize.h"
+#include "render.h"
 
 vec4 verts[] = {
     { 0.437500, 0.164062, 0.765625, 1.0 },
@@ -1507,7 +1508,7 @@ int vert_shader(vec4 *vert1, vec4 *vert2, vec4 *vert3, void *data, void **shared
         }, translate = {
             1, 0, 0, 0,
             0, 1, 0, 0,
-            0, 0, 1, -2.1+0.1*a,
+            0, 0, 1, -2.1+0.15*a,
             0, 0, 0, 1
         }, transform;
         dot_mat4(&translate, &rotate, &transform);
@@ -1522,24 +1523,8 @@ int vert_shader(vec4 *vert1, vec4 *vert2, vec4 *vert3, void *data, void **shared
     return 0;
 }
 
-void frag_shader(vec3 *rgb, vec3 *location, vec3 *coords, void *data, void *from_vertex) {
-
-}
-
-void render(framebuffer_t *buff)
-{
-    printf("\x1b[H");
-    for (int v = buff->height-2; v >= 0; v-=2) {
-        for (int u = 0; u < buff->width; u++) {
-            vec3 *c1 = &buff->color[(v+1)*buff->width + u],
-                 *c2 = &buff->color[v*buff->width + u];
-            unsigned char r1 = 255*c1->x, g1 = 255*c1->y, b1 = 255*c1->z,
-                r2 = 255*c2->x, g2 = 255*c2->y, b2 = 255*c2->z;
-
-            printf("\x1b[48;2;%i;%i;%i;38;2;%i;%i;%im\u2584", r1,g1,b1, r2,g2,b2);
-        }
-        printf("\x1b[0m\n");
-    }
+void frag_shader(vec4 *color, vec3 *coords, float depth, void *data, void *shared) {
+    init_vec4(color, coords->x, coords->y, coords->z, 1);
 }
 
 int main(int argc, char **argv) {
@@ -1554,10 +1539,11 @@ int main(int argc, char **argv) {
     };
 
     for (int i = 0; i < 400; i++) {
+        printf("\x1b[H");
         reset_framebuffer(&buff);
         rasterize(&buff, vert_shader, frag_shader, NULL);
-        render(&buff);
-        usleep(5000);
+        render_truecolor(&buff);
+        usleep(10000);
     }
 
     return 0;

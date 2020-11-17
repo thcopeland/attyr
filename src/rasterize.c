@@ -11,7 +11,8 @@ void rasterize(framebuffer_t *buff,
               void *shader_data)
 {
     void *shared;
-    vec4 v1, v2, v3;
+    vec4 v1, v2, v3, color;
+    vec3 coords;
 
     while (vert_shader(&v1, &v2, &v3, shader_data, &shared)) {
         vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos;
@@ -48,11 +49,13 @@ void rasterize(framebuffer_t *buff,
                     (l1=w*semi_dot(&pos, &l1_coeff)) >= 0 &&
                     (l2=w*semi_dot(&pos, &l2_coeff)) >= 0 &&
                     (l3=w*semi_dot(&pos, &l3_coeff)) >= 0) {
-                    vec3 foreground = { 1-w/3, 1-w/3, 1-w/3 };
+                    init_vec3(&coords, l1, l2, l3);
+                    frag_shader(&color, &coords, w, shader_data, shared);
 
-                    buff->depth[i * buff->width + j] = w;
-
-                    dup_vec3(&foreground, buff->color + i * buff->width + j);
+                    if (color.w > 0) {
+                        buff->depth[i * buff->width + j] = w;
+                        init_vec3(buff->color + i * buff->width + j, color.x, color.y, color.z);
+                    }
                 }
             }
         }
@@ -72,9 +75,7 @@ int to_screen_space(float z, int scale, int bias)
 void reset_framebuffer(framebuffer_t *buff)
 {
     for(int i = 0; i < buff->width*buff->height; i++) {
-        (buff->color+i)->x = 0;
-        (buff->color+i)->y = 0;
-        (buff->color+i)->z = 0;
+        init_vec3(buff->color+i, 0, 0, 0);
         buff->depth[i] = FLT_MAX;
     }
 }

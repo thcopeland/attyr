@@ -24,9 +24,9 @@ void rasterize(framebuffer_t *buff,
         /* drop back-facing and very small faces */
         if (invert_mat3(&matrix) <= 0) continue;
 
-        int min_i = to_screen_space(min3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, -1),
+        int min_i = to_screen_space(min3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, 0),
             max_i = to_screen_space(max3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, 1),
-            min_j = to_screen_space(min3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, -1),
+            min_j = to_screen_space(min3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, 0),
             max_j = to_screen_space(max3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, 1);
 
         init_vec3(&l1_coeff, matrix.m11, matrix.m12, matrix.m13);
@@ -48,7 +48,7 @@ void rasterize(framebuffer_t *buff,
                     (l1=w*dot_vec3(&pos, &l1_coeff)) >= 0 &&
                     (l2=w*dot_vec3(&pos, &l2_coeff)) >= 0 &&
                     (l3=w*dot_vec3(&pos, &l3_coeff)) >= 0) {
-                    vec3 foreground = { w/3, w/3, w/3 };
+                    vec3 foreground = { 1-w/3, 1-w/3, 1-w/3 };
 
                     buff->depth[i * buff->width + j] = w;
 

@@ -2,7 +2,6 @@
 #include <math.h>
 #include <unistd.h>
 #include "matrices.h"
-#include "transform.h"
 #include "rasterize.h"
 #include "render.h"
 
@@ -1528,7 +1527,7 @@ void frag_shader(vec4 *color, vec3 *coords, vec3 *pos, void *data, void *shared)
 }
 
 int main(int argc, char **argv) {
-    static int width = 140, height = 72;
+    static int width = 143, height = 72;
     vec3 color_buffer[width*height];
     float depth_buffer[width*height];
     framebuffer_t buff = {

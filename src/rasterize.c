@@ -15,11 +15,15 @@ void rasterize(framebuffer_t *buff,
     vec3 coords;
 
     while (vert_shader(&v1, &v2, &v3, shader_data, &shared)) {
-        vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos;
+        vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos, clip_pos;
         mat3 matrix = {
             v1.x, v2.x, v3.x,
             v1.y, v2.y, v3.y,
             v1.w, v2.w, v3.w
+        }, verts = {
+            v1.x, v2.x, v3.x,
+            v1.y, v2.y, v3.y,
+            v1.z, v2.z, v3.z
         };
 
         /* drop back-facing and very small faces */
@@ -45,16 +49,20 @@ void rasterize(framebuffer_t *buff,
 
                 float l1, l2, l3, w = 1/semi_dot(&pos, &w_coeff);
 
-                if (w >= 0 && w < buff->depth[i * buff->width + j] &&
-                    (l1=w*semi_dot(&pos, &l1_coeff)) >= 0 &&
+                if ((l1=w*semi_dot(&pos, &l1_coeff)) >= 0 &&
                     (l2=w*semi_dot(&pos, &l2_coeff)) >= 0 &&
                     (l3=w*semi_dot(&pos, &l3_coeff)) >= 0) {
+                    int k = i * buff->width + j;
                     init_vec3(&coords, l1, l2, l3);
-                    frag_shader(&color, &coords, w, shader_data, shared);
+                    dot_mat3vec3(&verts, &coords, &clip_pos);
 
-                    if (color.w > 0) {
-                        buff->depth[i * buff->width + j] = w;
-                        init_vec3(buff->color + i * buff->width + j, color.x, color.y, color.z);
+                    if (clip_pos.z < 0 && clip_pos.z > buff->depth[k]) {
+                        frag_shader(&color, &coords, &clip_pos, shader_data, shared);
+
+                        if (color.w > 0) {
+                            buff->depth[k] = clip_pos.z;
+                            init_vec3(buff->color + k, color.x, color.y, color.z);
+                        }
                     }
                 }
             }
@@ -76,6 +84,6 @@ void reset_framebuffer(framebuffer_t *buff)
 {
     for(int i = 0; i < buff->width*buff->height; i++) {
         init_vec3(buff->color+i, 0, 0, 0);
-        buff->depth[i] = FLT_MAX;
+        buff->depth[i] = -FLT_MAX;
     }
 }

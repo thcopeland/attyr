@@ -18,7 +18,7 @@ typedef int (*vertex_shader_f)(vec4 *vert1,
 
 typedef void (*fragment_shader_f)(vec4 *color,
                                   vec3 *coords,
-                                  float depth,
+                                  vec3 *pos,
                                   void *data,
                                   void *shared);
 

@@ -1497,9 +1497,9 @@ int vert_shader(vec4 *vert1, vec4 *vert2, vec4 *vert3, void *data, void **shared
         float a = 0.02 * (i/len);
         mat4 combined, perspective = {
             1, 0, 0, 0,
-            0, 0.9, 0, 0,
+            0, 2, 0, 0,
             0, 0, 1, 0,
-            0, 0, -1, 0
+            0, 0,-1, 0
         }, rotate = {
             cos(a), 0, sin(a), 0,
               0,    1,   0,    0,
@@ -1508,7 +1508,7 @@ int vert_shader(vec4 *vert1, vec4 *vert2, vec4 *vert3, void *data, void **shared
         }, translate = {
             1, 0, 0, 0,
             0, 1, 0, 0,
-            0, 0, 1, -2.1+0.15*a,
+            0, 0, 1, -2.5+0.15*a,
             0, 0, 0, 1
         }, transform;
         dot_mat4(&translate, &rotate, &transform);
@@ -1523,8 +1523,8 @@ int vert_shader(vec4 *vert1, vec4 *vert2, vec4 *vert3, void *data, void **shared
     return 0;
 }
 
-void frag_shader(vec4 *color, vec3 *coords, float depth, void *data, void *shared) {
-    init_vec4(color, coords->x, coords->y, coords->z, 1);
+void frag_shader(vec4 *color, vec3 *coords, vec3 *pos, void *data, void *shared) {
+    init_vec4(color, (2+pos->x)/4, (2+pos->y)/4, -pos->z/4, 1);
 }
 
 int main(int argc, char **argv) {

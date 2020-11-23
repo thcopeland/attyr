@@ -1,14 +1,14 @@
 #include "matrices.h"
 #include <math.h> /* fabs */
 
-void init_vec3(vec3 *v, float x, float y, float z)
+void attyr_init_vec3(attyr_vec3 *v, float x, float y, float z)
 {
     v->x = x;
     v->y = y;
     v->z = z;
 }
 
-void init_vec4(vec4 *v, float x, float y, float z, float w)
+void attyr_init_vec4(attyr_vec4 *v, float x, float y, float z, float w)
 {
     v->x = x;
     v->y = y;
@@ -16,34 +16,34 @@ void init_vec4(vec4 *v, float x, float y, float z, float w)
     v->w = w;
 }
 
-void dup_vec3(vec3 *src, vec3 *dst)
+void attyr_dup_vec3(attyr_vec3 *src, attyr_vec3 *dst)
 {
     *dst = *src;
 }
 
-void dup_vec4(vec4 *src, vec4 *dst)
+void attyr_dup_vec4(attyr_vec4 *src, attyr_vec4 *dst)
 {
     *dst = *src;
 }
 
-void dup_mat3(mat3 *src, mat3 *dst)
+void attyr_dup_mat3(attyr_mat3 *src, attyr_mat3 *dst)
 {
     *dst = *src;
 }
 
-void dup_mat4(mat4 *src, mat4 *dst)
+void attyr_dup_mat4(attyr_mat4 *src, attyr_mat4 *dst)
 {
     *dst = *src;
 }
 
-void scale_vec3(vec3 *v, float s)
+void attyr_scale_vec3(attyr_vec3 *v, float s)
 {
     v->x *= s;
     v->y *= s;
     v->z *= s;
 }
 
-void scale_vec4(vec4 *v, float s)
+void attyr_scale_vec4(attyr_vec4 *v, float s)
 {
     v->x *= s;
     v->y *= s;
@@ -51,7 +51,7 @@ void scale_vec4(vec4 *v, float s)
     v->w *= s;
 }
 
-void scale_mat3(mat3 *m, float s)
+void attyr_scale_mat3(attyr_mat3 *m, float s)
 {
     m->m11 *= s;
     m->m12 *= s;
@@ -64,7 +64,7 @@ void scale_mat3(mat3 *m, float s)
     m->m33 *= s;
 }
 
-void scale_mat4(mat4 *m, float s)
+void attyr_scale_mat4(attyr_mat4 *m, float s)
 {
     m->m11 *= s;
     m->m12 *= s;
@@ -84,14 +84,14 @@ void scale_mat4(mat4 *m, float s)
     m->m44 *= s;
 }
 
-void add_vec3(vec3 *a, vec3 *b, vec3 *c)
+void attyr_add_vec3(attyr_vec3 *a, attyr_vec3 *b, attyr_vec3 *c)
 {
     c->x = a->x + b->x;
     c->y = a->y + b->y;
     c->z = a->z + b->z;
 }
 
-void add_vec4(vec4 *a, vec4 *b, vec4 *c)
+void attyr_add_vec4(attyr_vec4 *a, attyr_vec4 *b, attyr_vec4 *c)
 {
     c->x = a->x + b->x;
     c->y = a->y + b->y;
@@ -99,7 +99,7 @@ void add_vec4(vec4 *a, vec4 *b, vec4 *c)
     c->w = a->w + b->w;
 }
 
-void add_mat3(mat3 *a, mat3 *b, mat3 *c)
+void attyr_add_mat3(attyr_mat3 *a, attyr_mat3 *b, attyr_mat3 *c)
 {
     c->m11 = a->m11 + b->m11;
     c->m12 = a->m12 + b->m12;
@@ -112,7 +112,7 @@ void add_mat3(mat3 *a, mat3 *b, mat3 *c)
     c->m33 = a->m33 + b->m33;
 }
 
-void add_mat4(mat4 *a, mat4 *b, mat4 *c)
+void attyr_add_mat4(attyr_mat4 *a, attyr_mat4 *b, attyr_mat4 *c)
 {
     c->m11 = a->m11 + b->m11;
     c->m12 = a->m12 + b->m12;
@@ -132,14 +132,14 @@ void add_mat4(mat4 *a, mat4 *b, mat4 *c)
     c->m44 = a->m44 + b->m44;
 }
 
-void sub_vec3(vec3 *a, vec3 *b, vec3 *c)
+void attyr_sub_vec3(attyr_vec3 *a, attyr_vec3 *b, attyr_vec3 *c)
 {
     c->x = a->x - b->x;
     c->y = a->y - b->y;
     c->z = a->z - b->z;
 }
 
-void sub_vec4(vec4 *a, vec4 *b, vec4 *c)
+void attyr_sub_vec4(attyr_vec4 *a, attyr_vec4 *b, attyr_vec4 *c)
 {
     c->x = a->x - b->x;
     c->y = a->y - b->y;
@@ -147,7 +147,7 @@ void sub_vec4(vec4 *a, vec4 *b, vec4 *c)
     c->w = a->w - b->w;
 }
 
-void sub_mat3(mat3 *a, mat3 *b, mat3 *c)
+void attyr_sub_mat3(attyr_mat3 *a, attyr_mat3 *b, attyr_mat3 *c)
 {
     c->m11 = a->m11 - b->m11;
     c->m12 = a->m12 - b->m12;
@@ -160,7 +160,7 @@ void sub_mat3(mat3 *a, mat3 *b, mat3 *c)
     c->m33 = a->m33 - b->m33;
 }
 
-void sub_mat4(mat4 *a, mat4 *b, mat4 *c)
+void attyr_sub_mat4(attyr_mat4 *a, attyr_mat4 *b, attyr_mat4 *c)
 {
     c->m11 = a->m11 - b->m11;
     c->m12 = a->m12 - b->m12;
@@ -180,14 +180,14 @@ void sub_mat4(mat4 *a, mat4 *b, mat4 *c)
     c->m44 = a->m44 - b->m44;
 }
 
-void had_vec3(vec3 *a, vec3 *b, vec3 *c)
+void attyr_had_vec3(attyr_vec3 *a, attyr_vec3 *b, attyr_vec3 *c)
 {
     c->x = a->x * b->x;
     c->y = a->y * b->y;
     c->z = a->z * b->z;
 }
 
-void had_vec4(vec4 *a, vec4 *b, vec4 *c)
+void attyr_had_vec4(attyr_vec4 *a, attyr_vec4 *b, attyr_vec4 *c)
 {
     c->x = a->x * b->x;
     c->y = a->y * b->y;
@@ -195,7 +195,7 @@ void had_vec4(vec4 *a, vec4 *b, vec4 *c)
     c->w = a->w * b->w;
 }
 
-void had_mat3(mat3 *a, mat3 *b, mat3 *c)
+void attyr_had_mat3(attyr_mat3 *a, attyr_mat3 *b, attyr_mat3 *c)
 {
     c->m11 = a->m11 * b->m11;
     c->m12 = a->m12 * b->m12;
@@ -208,7 +208,7 @@ void had_mat3(mat3 *a, mat3 *b, mat3 *c)
     c->m33 = a->m33 * b->m33;
 }
 
-void had_mat4(mat4 *a, mat4 *b, mat4 *c)
+void attyr_had_mat4(attyr_mat4 *a, attyr_mat4 *b, attyr_mat4 *c)
 {
     c->m11 = a->m11 * b->m11;
     c->m12 = a->m12 * b->m12;
@@ -228,17 +228,17 @@ void had_mat4(mat4 *a, mat4 *b, mat4 *c)
     c->m44 = a->m44 * b->m44;
 }
 
-float dot_vec3(vec3 *a, vec3 *b)
+float attyr_dot_vec3(attyr_vec3 *a, attyr_vec3 *b)
 {
     return a->x*b->x + a->y*b->y + a->z*b->z;
 }
 
-float dot_vec4(vec4 *a, vec4 *b)
+float attyr_dot_vec4(attyr_vec4 *a, attyr_vec4 *b)
 {
     return a->x*b->x + a->y*b->y + a->z*b->z + a->w*b->w;
 }
 
-void dot_mat3(mat3 *a, mat3 *b, mat3 *c)
+void attyr_dot_mat3(attyr_mat3 *a, attyr_mat3 *b, attyr_mat3 *c)
 {
     c->m11 = a->m11*b->m11 + a->m12*b->m21 + a->m13*b->m31;
     c->m12 = a->m11*b->m12 + a->m12*b->m22 + a->m13*b->m32;
@@ -251,14 +251,14 @@ void dot_mat3(mat3 *a, mat3 *b, mat3 *c)
     c->m33 = a->m31*b->m13 + a->m32*b->m23 + a->m33*b->m33;
 }
 
-void dot_mat3vec3(mat3 *m, vec3 *v, vec3 *c)
+void attyr_dot_mat3vec3(attyr_mat3 *m, attyr_vec3 *v, attyr_vec3 *c)
 {
     c->x = m->m11*v->x + m->m12*v->y + m->m13*v->z;
     c->y = m->m21*v->x + m->m22*v->y + m->m23*v->z;
     c->z = m->m31*v->x + m->m32*v->y + m->m33*v->z;
 }
 
-void dot_mat4(mat4 *a, mat4 *b, mat4 *c)
+void attyr_dot_mat4(attyr_mat4 *a, attyr_mat4 *b, attyr_mat4 *c)
 {
     c->m11 = a->m11*b->m11 + a->m12*b->m21 + a->m13*b->m31 + a->m14*b->m41;
     c->m12 = a->m11*b->m12 + a->m12*b->m22 + a->m13*b->m32 + a->m14*b->m42;
@@ -278,7 +278,7 @@ void dot_mat4(mat4 *a, mat4 *b, mat4 *c)
     c->m44 = a->m41*b->m14 + a->m42*b->m24 + a->m43*b->m34 + a->m44*b->m44;
 }
 
-void dot_mat4vec4(mat4 *m, vec4 *v, vec4 *c)
+void attyr_dot_mat4vec4(attyr_mat4 *m, attyr_vec4 *v, attyr_vec4 *c)
 {
     c->x = m->m11*v->x + m->m12*v->y + m->m13*v->z + m->m14*v->w;
     c->y = m->m21*v->x + m->m22*v->y + m->m23*v->z + m->m24*v->w;
@@ -286,7 +286,7 @@ void dot_mat4vec4(mat4 *m, vec4 *v, vec4 *c)
     c->w = m->m41*v->x + m->m42*v->y + m->m43*v->z + m->m44*v->w;
 }
 
-float invert_mat3(mat3 *m)
+float attyr_invert_mat3(attyr_mat3 *m)
 {
     float a = m->m22*m->m33 - m->m23*m->m32,
           b = m->m23*m->m31 - m->m21*m->m33,
@@ -299,7 +299,7 @@ float invert_mat3(mat3 *m)
           i = m->m11*m->m22 - m->m12*m->m21,
           det = m->m11*a + m->m12*b + m->m13*c;
 
-    if (fabs(det) >= MAT_INV_EPSILON) {
+    if (fabs(det) >= ATTYR_MAT_INV_EPSILON) {
         float s = 1/det;
 
         m->m11 = s*a; m->m12 = s*d; m->m13 = s*g;

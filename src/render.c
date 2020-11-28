@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 
-void render_truecolor(attyr_framebuffer_t *buff)
+void attyr_render_truecolor(attyr_framebuffer_t *buff)
 {
     for (int i=buff->height-2; i>=0; i-=2) {
         for (int j=0; j<buff->width; j++) {

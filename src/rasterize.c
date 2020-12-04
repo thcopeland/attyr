@@ -20,11 +20,10 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
                      attyr_fragment_shader_f frag_shader,
                      void *shader_data)
 {
-    void *shared;
     attyr_vec4 v1, v2, v3, color;
     attyr_vec3 coords;
 
-    while (vert_shader(&v1, &v2, &v3, shader_data, &shared)) {
+    while (vert_shader(&v1, &v2, &v3, shader_data)) {
         attyr_vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos, clip_pos;
         attyr_mat3x3 h_verts = {
             v1.x, v2.x, v3.x,
@@ -67,7 +66,7 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
                     attyr_mult_mat3x3_vec3(&verts, &coords, &clip_pos);
 
                     if (clip_pos.z < 0 && clip_pos.z > buff->depth[k]) {
-                        frag_shader(&color, &coords, &clip_pos, shader_data, shared);
+                        frag_shader(&color, &coords, &clip_pos, shader_data);
 
                         if (color.w > 0) {
                             buff->depth[k] = clip_pos.z;

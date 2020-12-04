@@ -35,7 +35,8 @@ void free_framebuffer(attyr_framebuffer_t *framebuffer)
 
 void reset_render_state(render_state_t *state)
 {
-    state->object = state->face = 0;
+    state->object = 0;
+    state->face = -1;
 }
 
 render_state_t *init_render_state(scene_t *scene)
@@ -52,60 +53,57 @@ float texture_lookup(texture_t *texture, unsigned int u, unsigned int v, unsigne
     return texture->data[(v*texture->width+u)*texture->channels+channel] / 255.0;
 }
 
-int vert_shader(attyr_vec4 *v1, attyr_vec4 *v2, attyr_vec4 *v3, void *data, void **shared)
+int vert_shader(attyr_vec4 *v1, attyr_vec4 *v2, attyr_vec4 *v3, void *data)
 {
     render_state_t *state = data;
     scene_t *scene = state->scene;
+    object_t *object = darray_index(scene->objects, state->object);
 
-    if (state->object < scene->objects->len) {
-        object_t *object = darray_index(scene->objects, state->object);
-        face_t *face = darray_index(object->faces, state->face);
-
-        float a = state->time * 0.00525;
-        mat4 combined, perspective = {
-             1, 0, 0, 0,
-             0, 2, 0, 0,
-             0, 0, 1, 0,
-             0, 0, -1, 0
-         }, rotate = {
-             cos(a), 0, sin(a), 0,
-               0,    1,   0,    0,
-             -sin(a),0, cos(a), 0,
-               0,    0,   0,    1
-         }, translate = {
-             1, 0, 0, 0,
-             0, 1, 0, -2,
-             0, 0, 1, -5+a/3,
-             0, 0, 0, 1
-         }, transform;
-
-         attyr_mult_mat4x4_4x4(&translate, &rotate, &transform);
-         attyr_mult_mat4x4_4x4(&perspective, &transform, &combined);
-
-         attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->a), v1);
-         attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->b), v2);
-         attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->c), v3);
-
-        if (++state->face >= object->faces->len) {
+    if (++state->face >= object->faces->len) {
+        if(++state->object >= scene->objects->len) {
+            return 0;
+        } else {
             state->face = 0;
-            state->object++;
-            state->time++;
+            object = darray_index(scene->objects, state->object);
         }
-
-        *shared = object;
-
-        return 1;
     }
 
-    return 0;
+    face_t *face = darray_index(object->faces, state->face);
+
+    float a = state->time * 0.063;
+    mat4 combined, perspective = {
+         1, 0, 0, 0,
+         0, 2, 0, 0,
+         0, 0, 1, 0,
+         0, 0, -1, 0
+     }, rotate = {
+         cos(a), 0, sin(a), 0,
+           0,    1,   0,    0,
+         -sin(a),0, cos(a), 0,
+           0,    0,   0,    1
+     }, translate = {
+         1, 0, 0, 0,
+         0, 1, 0, -2,
+         0, 0, 1, -5+a/6,
+         0, 0, 0, 1
+     }, transform;
+
+     attyr_mult_mat4x4_4x4(&translate, &rotate, &transform);
+     attyr_mult_mat4x4_4x4(&perspective, &transform, &combined);
+
+     attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->a), v1);
+     attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->b), v2);
+     attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->c), v3);
+
+    return 1;
 }
 
-void frag_shader(attyr_vec4 *color, attyr_vec3 *coords, attyr_vec3 *pos, void *data, void *shared)
+void frag_shader(attyr_vec4 *color, attyr_vec3 *coords, attyr_vec3 *pos, void *data)
 {
     render_state_t *state = data;
     scene_t *scene = state->scene;
-    object_t *object = shared;
-    face_t *face = darray_index(object->faces, state->face ? state->face-1 : object->faces->len-1);
+    object_t *object = darray_index(scene->objects, state->object);
+    face_t *face = darray_index(object->faces, state->face);
     texture_t *texture = object->texture;
     vec2 uv;
     mat2x3 vertex_uvs;
@@ -142,6 +140,7 @@ int main(int argc, char **argv)
         attyr_render_truecolor(framebuffer);
         reset_render_state(state);
         attyr_reset_framebuffer(framebuffer);
+        state->time++;
         usleep(5000);
     }
 

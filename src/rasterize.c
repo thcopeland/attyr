@@ -26,7 +26,7 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
 
     while (vert_shader(&v1, &v2, &v3, shader_data, &shared)) {
         attyr_vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos, clip_pos;
-        attyr_mat3 matrix = {
+        attyr_mat3x3 h_verts = {
             v1.x, v2.x, v3.x,
             v1.y, v2.y, v3.y,
             v1.w, v2.w, v3.w
@@ -37,19 +37,19 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
         };
 
         /* drop back-facing and very small faces */
-        if (attyr_invert_mat3(&matrix) <= 0) continue;
+        if (attyr_invert_mat3x3(&h_verts) <= 0) continue;
 
         int min_i = to_screen_space(min3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, 0),
             max_i = to_screen_space(max3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, 1),
             min_j = to_screen_space(min3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, 0),
             max_j = to_screen_space(max3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, 1);
 
-        attyr_init_vec3(&l1_coeff, matrix.m11, matrix.m12, matrix.m13);
-        attyr_init_vec3(&l2_coeff, matrix.m21, matrix.m22, matrix.m23);
-        attyr_init_vec3(&l3_coeff, matrix.m31, matrix.m32, matrix.m33);
-        attyr_init_vec3(&w_coeff,  matrix.m11+matrix.m21+matrix.m31,
-                                   matrix.m12+matrix.m22+matrix.m32,
-                                   matrix.m13+matrix.m23+matrix.m33);
+        attyr_init_vec3(&l1_coeff, h_verts.m11, h_verts.m12, h_verts.m13);
+        attyr_init_vec3(&l2_coeff, h_verts.m21, h_verts.m22, h_verts.m23);
+        attyr_init_vec3(&l3_coeff, h_verts.m31, h_verts.m32, h_verts.m33);
+        attyr_init_vec3(&w_coeff,  h_verts.m11+h_verts.m21+h_verts.m31,
+                                   h_verts.m12+h_verts.m22+h_verts.m32,
+                                   h_verts.m13+h_verts.m23+h_verts.m33);
 
         for(int i = min_i; i < max_i; i++) {
             pos.y = (float) 2*i/buff->height - 1;
@@ -64,7 +64,7 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
                     (l3=w*semi_dot(&pos, &l3_coeff)) >= 0) {
                     int k = i * buff->width + j;
                     attyr_init_vec3(&coords, l1, l2, l3);
-                    attyr_dot_mat3vec3(&verts, &coords, &clip_pos);
+                    attyr_mult_mat3x3_vec3(&verts, &coords, &clip_pos);
 
                     if (clip_pos.z < 0 && clip_pos.z > buff->depth[k]) {
                         frag_shader(&color, &coords, &clip_pos, shader_data, shared);

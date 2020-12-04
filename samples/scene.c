@@ -79,12 +79,12 @@ int vert_shader(attyr_vec4 *v1, attyr_vec4 *v2, attyr_vec4 *v3, void *data, void
              0, 0, 0, 1
          }, transform;
 
-         attyr_dot_mat4(&translate, &rotate, &transform);
-         attyr_dot_mat4(&perspective, &transform, &combined);
+         attyr_mult_mat4x4_4x4(&translate, &rotate, &transform);
+         attyr_mult_mat4x4_4x4(&perspective, &transform, &combined);
 
-         attyr_dot_mat4vec4(&combined, darray_index(scene->vertices, face->a), v1);
-         attyr_dot_mat4vec4(&combined, darray_index(scene->vertices, face->b), v2);
-         attyr_dot_mat4vec4(&combined, darray_index(scene->vertices, face->c), v3);
+         attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->a), v1);
+         attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->b), v2);
+         attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->c), v3);
 
         if (++state->face >= object->faces->len) {
             state->face = 0;
@@ -107,13 +107,14 @@ void frag_shader(attyr_vec4 *color, attyr_vec3 *coords, attyr_vec3 *pos, void *d
     object_t *object = shared;
     face_t *face = darray_index(object->faces, state->face ? state->face-1 : object->faces->len-1);
     texture_t *texture = object->texture;
+    vec2 uv;
+    mat2x3 vertex_uvs;
+    attyr_init_mat2x3(&vertex_uvs, darray_index(scene->tex_coords, face->u),
+                                   darray_index(scene->tex_coords, face->v),
+                                   darray_index(scene->tex_coords, face->w));
+    attyr_mult_mat2x3_vec3(&vertex_uvs, coords, &uv);
 
-    vec2 *uv1 = darray_index(scene->tex_coords, face->u),
-         *uv2 = darray_index(scene->tex_coords, face->v),
-         *uv3 = darray_index(scene->tex_coords, face->w);
-
-    unsigned int u = texture->width  * (uv1->x*coords->x + uv2->x*coords->y + uv3->x*coords->z),
-                 v = texture->height * (1-(uv1->y*coords->x + uv2->y*coords->y + uv3->y*coords->z));
+    unsigned int u = texture->width*uv.x, v = texture->height*(1-uv.y);
 
     attyr_init_vec4(color, texture_lookup(texture, u, v, 0),
                            texture_lookup(texture, u, v, 1),

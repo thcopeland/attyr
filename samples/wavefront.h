@@ -1,16 +1,6 @@
 #include <attyr/attyr.h>
+#include <attyr/short_names.h>
 #include "darray.h"
-
-/* for convenience */
-typedef attyr_vec3 vec3;
-typedef attyr_vec4 vec4;
-typedef attyr_mat3 mat3;
-typedef attyr_mat4 mat4;
-
-/* maybe we should include this in libattyr? */
-typedef struct {
-    float x, y;
-} vec2;
 
 /*
  * Holds information of a single texture.

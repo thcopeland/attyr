@@ -77,26 +77,6 @@ void test_subtraction_vec4(void)
     assert_vec4_eq(a, exp, "vec4 subtraction");
 }
 
-void test_hadamard_vec3(void)
-{
-    attyr_vec3 a = { 1, 2, 3 };
-    attyr_vec3 b = { 4, -1, 1 };
-    attyr_vec3 exp = { 4, -2, 3 };
-
-    attyr_had_vec3(&a, &b, &a);
-    assert_vec3_eq(a, exp, "vec3 hadamard");
-}
-
-void test_hadamard_vec4(void)
-{
-    attyr_vec4 a = { 1, 2, 3, 4 };
-    attyr_vec4 b = { 4, -1, 1, 7 };
-    attyr_vec4 exp = { 4, -2, 3, 28 };
-
-    attyr_had_vec4(&a, &b, &a);
-    assert_vec4_eq(a, exp, "vec4 hadamard");
-}
-
 void test_dot_product_vec3(void)
 {
     attyr_vec3 a = { 1,2,3 };
@@ -126,9 +106,6 @@ int main(int argc, char **argv)
 
     test_subtraction_vec3();
     test_subtraction_vec4();
-
-    test_hadamard_vec3();
-    test_hadamard_vec4();
 
     test_dot_product_vec3();
     test_dot_product_vec4();

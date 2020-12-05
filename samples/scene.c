@@ -8,6 +8,7 @@
 
 typedef struct {
     scene_t *scene;
+    mat2x3 texture_coords;
     unsigned int object, face;
     unsigned long time;
 } render_state_t;
@@ -70,30 +71,13 @@ int vert_shader(attyr_vec4 *v1, attyr_vec4 *v2, attyr_vec4 *v3, void *data)
 
     face_t *face = darray_index(object->faces, state->face);
 
-    float a = state->time * 0.063;
-    mat4 combined, perspective = {
-         1, 0, 0, 0,
-         0, 2, 0, 0,
-         0, 0, 1, 0,
-         0, 0, -1, 0
-     }, rotate = {
-         cos(a), 0, sin(a), 0,
-           0,    1,   0,    0,
-         -sin(a),0, cos(a), 0,
-           0,    0,   0,    1
-     }, translate = {
-         1, 0, 0, 0,
-         0, 1, 0, -2,
-         0, 0, 1, -5+a/6,
-         0, 0, 0, 1
-     }, transform;
+    attyr_mult_mat4x4_vec4(&object->transform, darray_index(scene->vertices, face->a), v1);
+    attyr_mult_mat4x4_vec4(&object->transform, darray_index(scene->vertices, face->b), v2);
+    attyr_mult_mat4x4_vec4(&object->transform, darray_index(scene->vertices, face->c), v3);
 
-     attyr_mult_mat4x4_4x4(&translate, &rotate, &transform);
-     attyr_mult_mat4x4_4x4(&perspective, &transform, &combined);
-
-     attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->a), v1);
-     attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->b), v2);
-     attyr_mult_mat4x4_vec4(&combined, darray_index(scene->vertices, face->c), v3);
+    attyr_init_mat2x3(&state->texture_coords, darray_index(scene->tex_coords, face->u),
+                                              darray_index(scene->tex_coords, face->v),
+                                              darray_index(scene->tex_coords, face->w));
 
     return 1;
 }
@@ -103,14 +87,9 @@ void frag_shader(attyr_vec4 *color, attyr_vec3 *coords, attyr_vec3 *pos, void *d
     render_state_t *state = data;
     scene_t *scene = state->scene;
     object_t *object = darray_index(scene->objects, state->object);
-    face_t *face = darray_index(object->faces, state->face);
     texture_t *texture = object->texture;
     vec2 uv;
-    mat2x3 vertex_uvs;
-    attyr_init_mat2x3(&vertex_uvs, darray_index(scene->tex_coords, face->u),
-                                   darray_index(scene->tex_coords, face->v),
-                                   darray_index(scene->tex_coords, face->w));
-    attyr_mult_mat2x3_vec3(&vertex_uvs, coords, &uv);
+    attyr_mult_mat2x3_vec3(&state->texture_coords, coords, &uv);
 
     unsigned int u = texture->width*uv.x, v = texture->height*(1-uv.y);
 
@@ -141,6 +120,31 @@ int main(int argc, char **argv)
         reset_render_state(state);
         attyr_reset_framebuffer(framebuffer);
         state->time++;
+
+        for (int i = 0; i < scene->objects->len; i++) {
+            object_t *object = darray_index(scene->objects, i);
+            float t = state->time * 0.063;
+            mat4 rotate = {
+                 cos(t), 0, sin(t), 0,
+                   0,    1,   0,    0,
+                 -sin(t),0, cos(t), 0,
+                   0,    0,   0,    1
+             }, translate = {
+                 1, 0, 0, 0,
+                 0, 1, 0, -2,
+                 0, 0, 1, -5+t/6,
+                 0, 0, 0, 1
+             }, perspective = {
+                  1, 0, 0, 0,
+                  0, 2, 0, 0,
+                  0, 0, 1, 0,
+                  0, 0, -1, 0
+              };
+
+             attyr_mult_mat4x4_4x4(&translate, &rotate, &object->transform);
+             attyr_mult_mat4x4_4x4(&perspective, &object->transform, &object->transform);
+        }
+
         usleep(5000);
     }
 

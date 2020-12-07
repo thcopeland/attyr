@@ -15,12 +15,19 @@ static int to_screen_space(float z, int scale, int bias)
     return fmax(fmin(scale*(z+1)/2 + bias, scale), 0);
 }
 
+static void set_color(attyr_color_t *fragment, float r, float g, float b)
+{
+    fragment->r = 255 * r;
+    fragment->g = 255 * g;
+    fragment->b = 255 * b;
+}
+
 void attyr_rasterize(attyr_framebuffer_t *buff,
                      attyr_vertex_shader_f vert_shader,
                      attyr_fragment_shader_f frag_shader,
                      void *shader_data)
 {
-    attyr_vec4 v1, v2, v3, color;
+    attyr_vec4 v1, v2, v3, fragment;
     attyr_vec3 coords;
 
     while (vert_shader(&v1, &v2, &v3, shader_data)) {
@@ -66,11 +73,11 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
                     attyr_mult_mat3x3_vec3(&verts, &coords, &clip_pos);
 
                     if (clip_pos.z < 0 && clip_pos.z > buff->depth[k]) {
-                        frag_shader(&color, &coords, &clip_pos, shader_data);
+                        frag_shader(&fragment, &coords, &clip_pos, shader_data);
 
-                        if (color.w > 0) {
+                        if (fragment.w > 0) {
                             buff->depth[k] = clip_pos.z;
-                            attyr_init_vec3(buff->color + k, color.x, color.y, color.z);
+                            set_color(buff->color + k, fragment.x, fragment.y, fragment.z);
                         }
                     }
                 }
@@ -82,7 +89,7 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
 void attyr_reset_framebuffer(attyr_framebuffer_t *buff)
 {
     for(int i = 0; i < buff->width*buff->height; i++) {
-        attyr_init_vec3(buff->color+i, 0, 0, 0);
+        set_color(buff->color+i, 0, 0, 0);
         buff->depth[i] = -FLT_MAX;
     }
 }

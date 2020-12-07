@@ -114,13 +114,6 @@ int main(int argc, char **argv)
     }
 
     for (int i = 0; i < 400; i++) {
-        printf("\x1b[H");
-        attyr_rasterize(framebuffer, vert_shader, frag_shader, state);
-        attyr_render_truecolor(framebuffer);
-        reset_render_state(state);
-        attyr_reset_framebuffer(framebuffer);
-        state->time++;
-
         for (int i = 0; i < scene->objects->len; i++) {
             object_t *object = darray_index(scene->objects, i);
             float t = state->time * 0.063;
@@ -144,6 +137,13 @@ int main(int argc, char **argv)
              attyr_mult_mat4x4_4x4(&translate, &rotate, &object->transform);
              attyr_mult_mat4x4_4x4(&perspective, &object->transform, &object->transform);
         }
+
+        printf("\x1b[H");
+        attyr_rasterize(framebuffer, vert_shader, frag_shader, state);
+        attyr_render_truecolor(framebuffer);
+        reset_render_state(state);
+        attyr_reset_framebuffer(framebuffer);
+        state->time++;
 
         usleep(5000);
     }

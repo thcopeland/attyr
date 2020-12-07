@@ -4,7 +4,11 @@
 #include "matrices.h"
 
 typedef struct {
-    attyr_vec3 *color;
+    unsigned char r, g, b;
+} attyr_color_t;
+
+typedef struct {
+    attyr_color_t *color;
     float *depth;
     unsigned int width;
     unsigned int height;
@@ -15,7 +19,7 @@ typedef int (*attyr_vertex_shader_f)(attyr_vec4 *vert1,
                                      attyr_vec4 *vert3,
                                      void *data);
 
-typedef void (*attyr_fragment_shader_f)(attyr_vec4 *color,
+typedef void (*attyr_fragment_shader_f)(attyr_vec4 *fragment,
                                         attyr_vec3 *coords,
                                         attyr_vec3 *pos,
                                         void *data);

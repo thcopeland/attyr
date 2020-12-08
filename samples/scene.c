@@ -2,6 +2,7 @@
 #include "common.h"
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
@@ -47,6 +48,17 @@ render_state_t *init_render_state(scene_t *scene)
     state->time = 0;
     reset_render_state(state);
     return state;
+}
+
+object_t *select_object(scene_t *scene, char *name)
+{
+    for (int i = 0; i < scene->objects->len; i++) {
+        object_t *obj = darray_index(scene->objects, i);
+
+        if (strstr(obj->id, name)) return obj;
+    }
+
+    return NULL;
 }
 
 float texture_lookup(texture_t *texture, unsigned int u, unsigned int v, unsigned int channel)
@@ -105,18 +117,26 @@ int main(int argc, char **argv)
     attyr_framebuffer_t *framebuffer = init_framebuffer(143, 78);
     render_state_t *state = init_render_state(scene);
     load_wavefront_objects("assets/Wizard.obj", scene);
-    load_texture("assets/Wizard_Texture.raw", 1024, 1024, 3, scene);
-    load_texture("assets/Wizard_Staff_Texture.raw", 512, 512, 3, scene);
+    load_wavefront_objects("assets/Ground.obj", scene);
+    load_wavefront_objects("assets/Backdrop.obj", scene);
+    texture_t *wizard_tex = load_texture("assets/Wizard_Texture.raw", 1024, 1024, 3, scene),
+              *staff_tex = load_texture("assets/Wizard_Staff_Texture.raw", 512, 512, 3, scene),
+              *backdrop_tex = load_texture("assets/immenstadter_horn_1k.raw", 1024, 512, 3, scene),
+              *ground_tex = load_texture("assets/Ground_Texture.raw", 1024, 1024, 3, scene);
 
-    for (int i = 0; i < scene->objects->len; i++) {
-        object_t *obj = darray_index(scene->objects, i);
-        obj->texture = darray_index(scene->textures, i == 1);
-    }
+    select_object(scene, "Wizard_Body")->texture = wizard_tex;
+    select_object(scene, "Pouch")->texture = wizard_tex;
+    select_object(scene, "Shoulder.R")->texture = wizard_tex;
+    select_object(scene, "Shoulder.L")->texture = wizard_tex;
+    select_object(scene, "Face")->texture = wizard_tex;
+    select_object(scene, "Wizard_Staff")->texture = staff_tex;
+    select_object(scene, "Ground")->texture = ground_tex;
+    select_object(scene, "Sphere")->texture = backdrop_tex;
 
     for (int i = 0; i < 400; i++) {
         for (int i = 0; i < scene->objects->len; i++) {
             object_t *object = darray_index(scene->objects, i);
-            float t = state->time * 0.063;
+            float t = state->time * 0.03;
             mat4 rotate = {
                  cos(t), 0, sin(t), 0,
                    0,    1,   0,    0,
@@ -125,7 +145,7 @@ int main(int argc, char **argv)
              }, translate = {
                  1, 0, 0, 0,
                  0, 1, 0, -2,
-                 0, 0, 1, -5+t/6,
+                 0, 0, 1, -5+t/3,
                  0, 0, 0, 1
              }, perspective = {
                   1, 0, 0, 0,
@@ -133,6 +153,12 @@ int main(int argc, char **argv)
                   0, 0, 1, 0,
                   0, 0, -1, 0
               };
+
+              if (strstr(object->id, "Ground")) {
+                  translate.m24 = -2.1;
+              } else if (strstr(object->id, "Sphere")) {
+                  translate.m24 = 4;
+              }
 
              attyr_mult_mat4x4_4x4(&translate, &rotate, &object->transform);
              attyr_mult_mat4x4_4x4(&perspective, &object->transform, &object->transform);

@@ -45,10 +45,20 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
         /* drop back-facing and very small faces */
         if (attyr_invert_mat3x3(&h_verts) <= 0) continue;
 
-        int min_i = to_screen_space(min3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, 0),
-            max_i = to_screen_space(max3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, 1),
-            min_j = to_screen_space(min3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, 0),
+        int min_i, max_i, min_j, max_j;
+
+        if (v1.w <= 0 || v2.w <= 0 || v3.w <= 0) {
+            /* TODO: See James Blinn's Corner: Calculating Screen Coverage */
+            min_i = 0;
+            max_i = buff->height;
+            min_j = 0;
+            max_j = buff->width;
+        } else {
+            min_i = to_screen_space(min3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, 0);
+            max_i = to_screen_space(max3(v1.y/v1.w, v2.y/v2.w, v3.y/v3.w), buff->height, 1);
+            min_j = to_screen_space(min3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, 0);
             max_j = to_screen_space(max3(v1.x/v1.w, v2.x/v2.w, v3.x/v3.w), buff->width, 1);
+        }
 
         attyr_init_vec3(&l1_coeff, h_verts.m11, h_verts.m12, h_verts.m13);
         attyr_init_vec3(&l2_coeff, h_verts.m21, h_verts.m22, h_verts.m23);

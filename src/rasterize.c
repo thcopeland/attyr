@@ -72,10 +72,6 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
             verts->x, (verts+1)->x, (verts+2)->x,
             verts->y, (verts+1)->y, (verts+2)->y,
             verts->w, (verts+1)->w, (verts+2)->w
-        }, n3d_verts = {
-            verts->x, (verts+1)->x, (verts+2)->x,
-            verts->y, (verts+1)->y, (verts+2)->y,
-            verts->z, (verts+1)->z, (verts+2)->z
         };
 
         if (attyr_invert_mat3x3(&h2d_verts) <= 0 ||
@@ -108,13 +104,13 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
                     (l3=w*semi_dot(&pos, &l3_coeff)) >= 0) {
                     int k = i * buff->width + j;
                     attyr_init_vec3(&coords, l1, l2, l3);
-                    attyr_mult_mat3x3_vec3(&n3d_verts, &coords, &clip_pos);
+                    pos.z = l1*verts->z + l2*(verts+1)->z + l3*(verts+2)->z;
 
-                    if (clip_pos.z < 0 && clip_pos.z > buff->depth[k]) {
-                        frag_shader(&fragment, &coords, &clip_pos, shader_data);
+                    if (pos.z < 0 && pos.z > buff->depth[k]) {
+                        frag_shader(&fragment, &coords, &pos, shader_data);
 
                         if (fragment.w > 0) {
-                            buff->depth[k] = clip_pos.z;
+                            buff->depth[k] = pos.z;
                             set_color(buff->color + k, fragment.x, fragment.y, fragment.z);
                         }
                     }

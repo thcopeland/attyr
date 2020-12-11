@@ -1,5 +1,5 @@
-#include "wavefront.h"
-#include "common.h"
+#include "utils/wavefront.h"
+#include "utils/common.h"
 
 #include <stdio.h>
 #include <string.h>

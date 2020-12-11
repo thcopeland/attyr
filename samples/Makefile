@@ -1,13 +1,10 @@
 CFLAGS = -lattyr -lm -Wall -O2
 CC = gcc
 
-SRC = scene.c darray.c common.c wavefront.c
-HDR = darray.h common.h wavefront.h
-
 all: scene tri
 
-scene: $(SRC) $(HDR)
-	$(CC) $(SRC) $(CFLAGS) -o $@
+scene: scene.c utils/darray.c utils/common.c utils/wavefront.c
+	$(CC) scene.c utils/darray.c utils/common.c utils/wavefront.c $(CFLAGS) -o $@
 
 tri: tri.c
 	$(CC) $^ $(CFLAGS) -o $@

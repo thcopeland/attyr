@@ -145,7 +145,7 @@ int main(int argc, char **argv)
                    0,    0,   0,    1
              }, translate = {
                  1, 0, 0, 0,
-                 0, 1, 0, -10+t*0.42,
+                 0, 1, 0, -10+t*0.43,
                  0, 0, 1, -22+t,
                  0, 0, 0, 1
              }, perspective = {

@@ -163,7 +163,7 @@ int main(int argc, char **argv)
     scene_t *scene = init_scene();
     load_wavefront_objects("assets/Scene.obj", scene);
 
-    attyr_framebuffer_t *framebuffer = init_framebuffer(215, 114);
+    attyr_framebuffer_t *framebuffer = init_framebuffer(136, 70);
     render_state_t *state = init_render_state(scene);
     int wizard_tex = load_texture("assets/Wizard_Texture.raw", 1024, 1024, 3, scene),
         staff_tex = load_texture("assets/Wizard_Staff_Texture.raw", 512, 512, 3, scene),
@@ -189,7 +189,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < 700; i++) {
         for (int i = 0; i < scene->objects->len; i++) {
             object_t *object = darray_index(scene->objects, i);
-            float t = 6.4/(1+exp(3-state->time));
+            float t = 5.7/(1+exp(3-state->time));
             mat4 rotate = {
                  cos(t), 0, sin(t), 0,
                    0,    1,   0,    0,
@@ -197,8 +197,8 @@ int main(int argc, char **argv)
                    0,    0,   0,    1
              }, translate = {
                  1, 0, 0, 0,
-                 0, 1, 0, -10+1.25*t,
-                 0, 0, 1, -22+3.2*t,
+                 0, 1, 0, -10+1.5*t,
+                 0, 0, 1, -22+3.5*t,
                  0, 0, 0, 1
              }, perspective = {
                   1, 0, 0, 0,

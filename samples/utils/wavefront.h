@@ -71,16 +71,16 @@ scene_t *init_scene(void);
 void load_wavefront_objects(char *filename, scene_t *scene);
 
 /*
- * Load a texture from the given file.
+ * Load a texture from the given file. Returns the index of the new texture.
  * width - width of the texture, in pixels
  * height - height of the texture, in pixels
  * channel_size - the number of 1-byte channels per pixel (RGB - 3, RGBA - 4).
  */
-texture_t *load_texture(char *filename,
-                        unsigned int width,
-                        unsigned int height,
-                        unsigned int channel_size,
-                        scene_t *scene);
+ int load_texture(char *filename,
+                  unsigned int width,
+                  unsigned int height,
+                  unsigned int channel_size,
+                  scene_t *scene);
 
 /*
  * Free the memory held by the given scene and associated data.

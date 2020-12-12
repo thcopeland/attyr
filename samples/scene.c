@@ -5,13 +5,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <unistd.h>
 
 typedef struct {
     scene_t *scene;
     mat2x3 texture_coords;
     unsigned int object, face;
-    unsigned long time;
+    float time;
 } render_state_t;
 
 attyr_framebuffer_t *init_framebuffer(unsigned int width, unsigned int height)
@@ -50,15 +49,15 @@ render_state_t *init_render_state(scene_t *scene)
     return state;
 }
 
-object_t *select_object(scene_t *scene, char *name)
+void set_texture_by_name(scene_t *scene, char *name, int texture_index)
 {
     for (int i = 0; i < scene->objects->len; i++) {
         object_t *obj = darray_index(scene->objects, i);
 
-        if (strstr(obj->id, name)) return obj;
+        if (strstr(obj->id, name)) {
+            obj->texture = darray_index(scene->textures, texture_index);
+        }
     }
-
-    return NULL;
 }
 
 float texture_lookup(texture_t *texture, unsigned int u, unsigned int v, unsigned int channel)
@@ -114,38 +113,39 @@ void frag_shader(attyr_vec4 *color, attyr_vec3 *coords, attyr_vec3 *pos, void *d
 int main(int argc, char **argv)
 {
     scene_t *scene = init_scene();
-    attyr_framebuffer_t *framebuffer = init_framebuffer(143, 78);
+    load_wavefront_objects("assets/Scene.obj", scene);
+
+    attyr_framebuffer_t *framebuffer = init_framebuffer(136, 70);
     render_state_t *state = init_render_state(scene);
-    load_wavefront_objects("assets/Wizard.obj", scene);
-    load_wavefront_objects("assets/Ground.obj", scene);
-    load_wavefront_objects("assets/Backdrop.obj", scene);
-    texture_t *wizard_tex = load_texture("assets/Wizard_Texture.raw", 1024, 1024, 3, scene),
-              *staff_tex = load_texture("assets/Wizard_Staff_Texture.raw", 512, 512, 3, scene),
-              *backdrop_tex = load_texture("assets/immenstadter_horn_1k.raw", 1024, 512, 3, scene),
-              *ground_tex = load_texture("assets/Ground_Texture.raw", 1024, 1024, 3, scene);
+    int wizard_tex = load_texture("assets/Wizard_Texture.raw", 1024, 1024, 3, scene),
+        staff_tex = load_texture("assets/Wizard_Staff_Texture.raw", 512, 512, 3, scene),
+        backdrop_tex = load_texture("assets/Backdrop_Texture.raw", 1024, 512, 3, scene),
+        flower_tex = load_texture("assets/Flower_Texture.raw", 64, 64, 3, scene),
+        ground_tex = load_texture("assets/Ground_Texture.raw", 1024, 1024, 3, scene),
+        tree_tex = load_texture("assets/Tree_Texture.raw", 256, 256, 3, scene);
 
-    select_object(scene, "Wizard_Body")->texture = wizard_tex;
-    select_object(scene, "Pouch")->texture = wizard_tex;
-    select_object(scene, "Shoulder.R")->texture = wizard_tex;
-    select_object(scene, "Shoulder.L")->texture = wizard_tex;
-    select_object(scene, "Face")->texture = wizard_tex;
-    select_object(scene, "Wizard_Staff")->texture = staff_tex;
-    select_object(scene, "Ground")->texture = ground_tex;
-    select_object(scene, "Sphere")->texture = backdrop_tex;
+    set_texture_by_name(scene, "Wizard", wizard_tex);
+    set_texture_by_name(scene, "Pouch", wizard_tex);
+    set_texture_by_name(scene, "Shoulder", wizard_tex);
+    set_texture_by_name(scene, "Face", wizard_tex);
+    set_texture_by_name(scene, "Staff", staff_tex);
+    set_texture_by_name(scene, "Backdrop", backdrop_tex);
+    set_texture_by_name(scene, "Flower", flower_tex);
+    set_texture_by_name(scene, "Tree", tree_tex);
+    set_texture_by_name(scene, "Ground", ground_tex);
 
-    for (int i = 0; i < 400; i++) {
+    for (int i = 0; i < 630; i++) {
         for (int i = 0; i < scene->objects->len; i++) {
             object_t *object = darray_index(scene->objects, i);
-            float t = state->time * 0.03;
             mat4 rotate = {
-                 cos(t), 0, sin(t), 0,
+                 cos(state->time), 0, sin(state->time), 0,
                    0,    1,   0,    0,
-                 -sin(t),0, cos(t), 0,
+                 -sin(state->time),0, cos(state->time), 0,
                    0,    0,   0,    1
              }, translate = {
                  1, 0, 0, 0,
-                 0, 1, 0, -2,
-                 0, 0, 1, -5+t/3,
+                 0, 1, 0, -10+state->time*0.42,
+                 0, 0, 1, -22+state->time,
                  0, 0, 0, 1
              }, perspective = {
                   1, 0, 0, 0,
@@ -154,14 +154,8 @@ int main(int argc, char **argv)
                   0, 0, -1, 0
               };
 
-              if (strstr(object->id, "Ground")) {
-                  translate.m24 = -2.1;
-              } else if (strstr(object->id, "Sphere")) {
-                  translate.m24 = 4;
-              }
-
-             attyr_mult_mat4x4_4x4(&translate, &rotate, &object->transform);
-             attyr_mult_mat4x4_4x4(&perspective, &object->transform, &object->transform);
+             attyr_mult_mat4x4_4x4(&translate, &rotate, &translate);
+             attyr_mult_mat4x4_4x4(&perspective, &translate, &object->transform);
         }
 
         printf("\x1b[H");
@@ -169,9 +163,7 @@ int main(int argc, char **argv)
         attyr_render_truecolor(framebuffer);
         reset_render_state(state);
         attyr_reset_framebuffer(framebuffer);
-        state->time++;
-
-        usleep(5000);
+        state->time += 0.03;
     }
 
     free_scene(scene);

@@ -1,10 +1,9 @@
-#include "darray.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 
+#include "darray.h"
 #include "common.h"
 
 darray_t *darray_init(unsigned int elt_size, unsigned int capacity)

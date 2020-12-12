@@ -73,11 +73,11 @@ void load_wavefront_objects(char *filename, scene_t *scene)
     }
 }
 
-texture_t *load_texture(char *filename,
-                        unsigned int width,
-                        unsigned int height,
-                        unsigned int channel_size,
-                        scene_t *scene)
+int load_texture(char *filename,
+                 unsigned int width,
+                 unsigned int height,
+                 unsigned int channel_size,
+                 scene_t *scene)
 {
     FILE *f = fopen(filename, "r");
 
@@ -96,7 +96,7 @@ texture_t *load_texture(char *filename,
         fclose(f);
         darray_append(scene->textures, &texture);
 
-        return darray_last(scene->textures);
+        return scene->textures->len-1;
     } else {
         die("(texture) Unable to load %s: %s\n", filename, strerror(errno));
     }

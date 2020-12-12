@@ -1,10 +1,10 @@
-CFLAGS = -lattyr -lm -Wall -O2
+CFLAGS = -lattyr -lm -Wall -O3 -flto
 CC = gcc
 
 all: scene tri
 
 scene: scene.c utils/darray.c utils/common.c utils/wavefront.c
-	$(CC) scene.c utils/darray.c utils/common.c utils/wavefront.c $(CFLAGS) -o $@
+	$(CC) $^ $(CFLAGS) -o $@
 
 tri: tri.c
 	$(CC) $^ $(CFLAGS) -o $@

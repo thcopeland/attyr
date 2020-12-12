@@ -137,7 +137,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < 630; i++) {
         for (int i = 0; i < scene->objects->len; i++) {
             object_t *object = darray_index(scene->objects, i);
-            float t = 19/(1+exp(4-state->time/2));
+            float t = 6.5/(1+exp(3-state->time));
             mat4 rotate = {
                  cos(t), 0, sin(t), 0,
                    0,    1,   0,    0,
@@ -145,8 +145,8 @@ int main(int argc, char **argv)
                    0,    0,   0,    1
              }, translate = {
                  1, 0, 0, 0,
-                 0, 1, 0, -10+t*0.43,
-                 0, 0, 1, -22+t,
+                 0, 1, 0, -10+1.25*t,
+                 0, 0, 1, -22+3.2*t,
                  0, 0, 0, 1
              }, perspective = {
                   1, 0, 0, 0,
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
         attyr_render_truecolor(framebuffer);
         reset_render_state(state);
         attyr_reset_framebuffer(framebuffer);
-        state->time += 0.03;
+        state->time += 0.01;
     }
 
     free_scene(scene);

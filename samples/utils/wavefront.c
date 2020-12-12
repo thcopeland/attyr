@@ -102,6 +102,11 @@ int load_texture(char *filename,
     }
 }
 
+float texture_lookup(texture_t *texture, unsigned int u, unsigned int v, unsigned int channel)
+{
+    return texture->data[(v*texture->width+u)*texture->channels+channel] / 255.0;
+}
+
 /*
  * Initialize an object_t structure from a buffer.
  */
@@ -139,6 +144,15 @@ static void init_face(char *buffer,
     face->w += vt_base - 1;
 }
 
+void add_light(scene_t *scene, float r, float g, float b, float x, float y, float z)
+{
+    light_t light;
+    attyr_init_vec3(&light.color, r, g, b);
+    attyr_init_vec3(&light.position, x, y, z);
+
+    darray_append(scene->lights, &light);
+}
+
 scene_t *init_scene(void)
 {
     scene_t *scene = xmalloc(sizeof(scene_t));
@@ -149,6 +163,7 @@ scene_t *init_scene(void)
     scene->tex_coords = darray_init(sizeof(vec2), 1024);
     scene->textures   = darray_init(sizeof(texture_t), 4);
     scene->objects    = darray_init(sizeof(object_t), 4);
+    scene->lights     = darray_init(sizeof(light_t), 2);
 
     return scene;
 }

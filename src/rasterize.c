@@ -17,9 +17,9 @@ static int to_screen_space(float z, int scale, int bias)
 
 static void set_color(attyr_color_t *fragment, float r, float g, float b)
 {
-    fragment->r = 255 * r;
-    fragment->g = 255 * g;
-    fragment->b = 255 * b;
+    fragment->r = r * 255;
+    fragment->g = g * 255;
+    fragment->b = b * 255;
 }
 
 static int calculate_bounds(attyr_vec4 *bounds, attyr_vec4 *verts)

@@ -112,6 +112,13 @@ void attyr_dup_mat4x3(attyr_mat4x3 *src, attyr_mat4x3 *dst);
 void attyr_dup_mat4x4(attyr_mat4x4 *src, attyr_mat4x4 *dst);
 
 /*
+ * Calculate the length of the vector.
+ */
+float attyr_len_vec2(attyr_vec2 *v);
+float attyr_len_vec3(attyr_vec3 *v);
+float attyr_len_vec4(attyr_vec4 *v);
+
+/*
  * Multiply every entry in the vector by a scalar.
  */
 void attyr_scale_vec2(attyr_vec2 *v, float s);

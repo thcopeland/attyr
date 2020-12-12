@@ -60,11 +60,6 @@ void set_texture_by_name(scene_t *scene, char *name, int texture_index)
     }
 }
 
-float texture_lookup(texture_t *texture, unsigned int u, unsigned int v, unsigned int channel)
-{
-    return texture->data[(v*texture->width+u)*texture->channels+channel] / 255.0;
-}
-
 int vert_shader(attyr_vec4 *v1, attyr_vec4 *v2, attyr_vec4 *v3, void *data)
 {
     render_state_t *state = data;
@@ -93,21 +88,74 @@ int vert_shader(attyr_vec4 *v1, attyr_vec4 *v2, attyr_vec4 *v3, void *data)
     return 1;
 }
 
-void frag_shader(attyr_vec4 *color, attyr_vec3 *coords, attyr_vec3 *pos, void *data)
+void calc_texture_fragment(texture_t *texture, vec3 *output, mat2x3 *face_uvs, vec3 *barycentric)
+{
+    unsigned int u, v;
+    vec2 uv;
+
+    attyr_mult_mat2x3_vec3(face_uvs, barycentric, &uv);
+    u = texture->width*uv.x;
+    v = texture->height*(1-uv.y);
+
+    attyr_init_vec3(output, texture_lookup(texture, u, v, 0),
+                            texture_lookup(texture, u, v, 1),
+                            texture_lookup(texture, u, v, 2));
+}
+
+void calc_illumination(vec3 *output, face_t *face, vec3 *barycentric, scene_t *scene)
+{
+    vec4 *v1 = darray_index(scene->vertices, face->a),
+         *v2 = darray_index(scene->vertices, face->b),
+         *v3 = darray_index(scene->vertices, face->c);
+    vec3 *n1 = darray_index(scene->normals, face->m),
+         *n2 = darray_index(scene->normals, face->n),
+         *n3 = darray_index(scene->normals, face->p),
+         position, normal;
+
+    mat3x3 verts = {
+        v1->x, v2->x, v3->x,
+        v1->y, v2->y, v3->y,
+        v1->z, v2->z, v3->z
+    }, normals = {
+        n1->x, n2->x, n3->x,
+        n1->y, n2->y, n3->y,
+        n1->z, n2->z, n3->z
+    };
+
+    attyr_init_vec3(output, 1, 1, 1);
+
+    attyr_mult_mat3x3_vec3(&verts, barycentric, &position);
+    attyr_mult_mat3x3_vec3(&normals, barycentric, &normal);
+
+    for (int i = 0; i < scene->lights->len; i++) {
+        light_t *light = darray_index(scene->lights, i);
+        float intensity;
+        vec3 dist;
+
+        attyr_sub_vec3(&light->position, &position, &dist);
+        attyr_scale_vec3(&dist, 1/attyr_len_vec3(&dist));
+
+        intensity = fmax(0, attyr_dot_vec3(&dist, &normal))*0.8+0.2;
+
+        output->x *= light->color.x * intensity;
+        output->y *= light->color.y * intensity;
+        output->z *= light->color.z * intensity;
+    }
+}
+
+void frag_shader(vec4 *output, vec3 *coords, vec3 *pos, void *data)
 {
     render_state_t *state = data;
     scene_t *scene = state->scene;
     object_t *object = darray_index(scene->objects, state->object);
     texture_t *texture = object->texture;
-    vec2 uv;
-    attyr_mult_mat2x3_vec3(&state->texture_coords, coords, &uv);
+    face_t *face = darray_index(object->faces, state->face);
+    vec3 color, illum;
 
-    unsigned int u = texture->width*uv.x, v = texture->height*(1-uv.y);
+    calc_texture_fragment(texture, &color, &state->texture_coords, coords);
+    calc_illumination(&illum, face, coords, scene);
 
-    attyr_init_vec4(color, texture_lookup(texture, u, v, 0),
-                           texture_lookup(texture, u, v, 1),
-                           texture_lookup(texture, u, v, 2),
-                           1.0);
+    attyr_init_vec4(output, color.x*illum.x, color.y*illum.y, color.z*illum.z, 1.0);
 }
 
 int main(int argc, char **argv)
@@ -115,14 +163,15 @@ int main(int argc, char **argv)
     scene_t *scene = init_scene();
     load_wavefront_objects("assets/Scene.obj", scene);
 
-    attyr_framebuffer_t *framebuffer = init_framebuffer(136, 70);
+    attyr_framebuffer_t *framebuffer = init_framebuffer(215, 114);
     render_state_t *state = init_render_state(scene);
     int wizard_tex = load_texture("assets/Wizard_Texture.raw", 1024, 1024, 3, scene),
         staff_tex = load_texture("assets/Wizard_Staff_Texture.raw", 512, 512, 3, scene),
         backdrop_tex = load_texture("assets/Backdrop_Texture.raw", 1024, 512, 3, scene),
         flower_tex = load_texture("assets/Flower_Texture.raw", 64, 64, 3, scene),
         ground_tex = load_texture("assets/Ground_Texture.raw", 1024, 1024, 3, scene),
-        tree_tex = load_texture("assets/Tree_Texture.raw", 256, 256, 3, scene);
+        tree_tex = load_texture("assets/Tree_Texture.raw", 256, 256, 3, scene),
+        plant_tex = load_texture("assets/Plant_Texture.raw", 32, 32, 3, scene);
 
     set_texture_by_name(scene, "Wizard", wizard_tex);
     set_texture_by_name(scene, "Pouch", wizard_tex);
@@ -133,11 +182,14 @@ int main(int argc, char **argv)
     set_texture_by_name(scene, "Flower", flower_tex);
     set_texture_by_name(scene, "Tree", tree_tex);
     set_texture_by_name(scene, "Ground", ground_tex);
+    set_texture_by_name(scene, "Plant", plant_tex);
 
-    for (int i = 0; i < 630; i++) {
+    add_light(scene, 1, 1, 1, 0, 2, 2);
+
+    for (int i = 0; i < 700; i++) {
         for (int i = 0; i < scene->objects->len; i++) {
             object_t *object = darray_index(scene->objects, i);
-            float t = 6.5/(1+exp(3-state->time));
+            float t = 6.4/(1+exp(3-state->time));
             mat4 rotate = {
                  cos(t), 0, sin(t), 0,
                    0,    1,   0,    0,

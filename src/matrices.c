@@ -207,6 +207,21 @@ void attyr_dup_mat4x4(attyr_mat4x4 *src, attyr_mat4x4 *dst)
 	*dst = *src;
 }
 
+float attyr_len_vec2(attyr_vec2 *v)
+{
+    return sqrt(v->x*v->x + v->y*v->y);
+}
+
+float attyr_len_vec3(attyr_vec3 *v)
+{
+    return sqrt(v->x*v->x + v->y*v->y + v->z*v->z);
+}
+
+float attyr_len_vec4(attyr_vec4 *v)
+{
+    return sqrt(v->x*v->x + v->y*v->y + v->z*v->z + v->w*v->w);
+}
+
 void attyr_scale_vec2(attyr_vec2 *v, float s)
 {
 	v->x *= s;

@@ -6,7 +6,7 @@
  * Holds information of a single texture.
  */
 typedef struct {
-    char *data;
+    unsigned char *data;
     unsigned int width, height, channels;
 } texture_t;
 
@@ -40,6 +40,10 @@ typedef struct {
     darray_t *faces; /* face_t */
 } object_t;
 
+typedef struct {
+    vec3 color, position;
+} light_t;
+
 /*
  * Scene information, all freed when the scene is freed. You can use these
  * however you like, or not at all, but they're designed to be:
@@ -57,6 +61,7 @@ typedef struct {
     darray_t *tex_coords; /* vec2 */
     darray_t *textures; /* texture_t */
     darray_t *objects;  /* object_t */
+    darray_t *lights; /* light_t */
 } scene_t;
 
 /*
@@ -71,6 +76,11 @@ scene_t *init_scene(void);
 void load_wavefront_objects(char *filename, scene_t *scene);
 
 /*
+ * Add a light to the scene.
+ */
+void add_light(scene_t *scene, float r, float g, float b, float x, float y, float z);
+
+/*
  * Load a texture from the given file. Returns the index of the new texture.
  * width - width of the texture, in pixels
  * height - height of the texture, in pixels
@@ -81,6 +91,14 @@ void load_wavefront_objects(char *filename, scene_t *scene);
                   unsigned int height,
                   unsigned int channel_size,
                   scene_t *scene);
+
+/*
+ * Look up a value in a texture.
+ */
+float texture_lookup(texture_t *texture,
+                     unsigned int u,
+                     unsigned int v,
+                     unsigned int channel);
 
 /*
  * Free the memory held by the given scene and associated data.

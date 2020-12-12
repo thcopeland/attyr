@@ -137,15 +137,16 @@ int main(int argc, char **argv)
     for (int i = 0; i < 630; i++) {
         for (int i = 0; i < scene->objects->len; i++) {
             object_t *object = darray_index(scene->objects, i);
+            float t = 19/(1+exp(4-state->time/2));
             mat4 rotate = {
-                 cos(state->time), 0, sin(state->time), 0,
+                 cos(t), 0, sin(t), 0,
                    0,    1,   0,    0,
-                 -sin(state->time),0, cos(state->time), 0,
+                 -sin(t),0, cos(t), 0,
                    0,    0,   0,    1
              }, translate = {
                  1, 0, 0, 0,
-                 0, 1, 0, -10+state->time*0.42,
-                 0, 0, 1, -22+state->time,
+                 0, 1, 0, -10+t*0.42,
+                 0, 0, 1, -22+t,
                  0, 0, 0, 1
              }, perspective = {
                   1, 0, 0, 0,

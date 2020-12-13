@@ -3,7 +3,7 @@ CC = gcc
 
 all: scene tri
 
-scene: scene.c utils/darray.c utils/common.c utils/wavefront.c
+scene: scene.c utils/darray.c utils/common.c utils/wavefront.c utils/helpers.c
 	$(CC) $^ $(CFLAGS) -o $@
 
 tri: tri.c

@@ -1,3 +1,6 @@
+#ifndef WAVEFRONT_H
+#define WAVEFRONT_H
+
 #include <attyr/attyr.h>
 #include <attyr/short_names.h>
 #include "darray.h"
@@ -65,13 +68,11 @@ typedef struct {
 } scene_t;
 
 /*
- * Allocate and initialize a scene with some reasonable defaults.
- */
-scene_t *init_scene(void);
-
-/*
  * Load all the OBJ objects in the given file to the given scene. If an error
  * occurs, we abort with a message to stderr.
+ * This is not a general OBJ importer. It make multiple assumtions, for example,
+ * that every face provides normal and UV data, and that all normals are pre-
+ * normalized.
  */
 void load_wavefront_objects(char *filename, scene_t *scene);
 
@@ -101,6 +102,19 @@ float texture_lookup(texture_t *texture,
                      unsigned int channel);
 
 /*
+ * Sets the texture of every object in the scene with an ID containing the
+ * given string.
+ */
+void set_texture_by_name(scene_t *scene, char *name, int texture_index);
+
+/*
+ * Allocate and initialize a scene with some reasonable defaults.
+ */
+scene_t *init_scene(void);
+
+/*
  * Free the memory held by the given scene and associated data.
  */
 void free_scene(scene_t *scene);
+
+#endif

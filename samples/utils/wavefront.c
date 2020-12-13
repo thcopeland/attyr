@@ -153,6 +153,15 @@ void add_light(scene_t *scene, float r, float g, float b, float x, float y, floa
     darray_append(scene->lights, &light);
 }
 
+void set_texture_by_name(scene_t *scene, char *name, int texture_index)
+{
+    for (int i = 0; i < scene->objects->len; i++) {
+        object_t *obj = darray_index(scene->objects, i);
+
+        if (strstr(obj->id, name)) obj->texture = texture_index;
+    }
+}
+
 scene_t *init_scene(void)
 {
     scene_t *scene = xmalloc(sizeof(scene_t));

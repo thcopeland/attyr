@@ -114,7 +114,7 @@ static void init_object(char *buffer, unsigned int size, object_t *object)
 {
     object->id = xmalloc(size);
     object->faces = darray_init(sizeof(face_t), 64);
-    object->texture = NULL;
+    object->texture = -1;
     sscanf(buffer, "o %s", object->id);
 }
 

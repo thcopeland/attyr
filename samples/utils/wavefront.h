@@ -35,7 +35,7 @@ typedef struct {
  */
 typedef struct {
     char *id;
-    texture_t *texture;
+    int texture;
     mat4 transform;
     darray_t *faces; /* face_t */
 } object_t;

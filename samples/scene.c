@@ -8,7 +8,6 @@
 
 typedef struct {
     scene_t *scene;
-    mat2x3 texture_coords;
     unsigned int object, face;
     float time;
 } render_state_t;
@@ -54,9 +53,7 @@ void set_texture_by_name(scene_t *scene, char *name, int texture_index)
     for (int i = 0; i < scene->objects->len; i++) {
         object_t *obj = darray_index(scene->objects, i);
 
-        if (strstr(obj->id, name)) {
-            obj->texture = darray_index(scene->textures, texture_index);
-        }
+        if (strstr(obj->id, name)) obj->texture = texture_index;
     }
 }
 
@@ -81,21 +78,25 @@ int vert_shader(attyr_vec4 *v1, attyr_vec4 *v2, attyr_vec4 *v3, void *data)
     attyr_mult_mat4x4_vec4(&object->transform, darray_index(scene->vertices, face->b), v2);
     attyr_mult_mat4x4_vec4(&object->transform, darray_index(scene->vertices, face->c), v3);
 
-    attyr_init_mat2x3(&state->texture_coords, darray_index(scene->tex_coords, face->u),
-                                              darray_index(scene->tex_coords, face->v),
-                                              darray_index(scene->tex_coords, face->w));
-
     return 1;
 }
 
-void calc_texture_fragment(texture_t *texture, vec3 *output, mat2x3 *face_uvs, vec3 *barycentric)
+void calc_texture_fragment(vec3 *output,
+                           texture_t *texture,
+                           face_t *face,
+                           vec3 *barycentric,
+                           scene_t *scene)
 {
+    mat2x3 coords;
     unsigned int u, v;
-    vec2 uv;
-
-    attyr_mult_mat2x3_vec3(face_uvs, barycentric, &uv);
-    u = texture->width*uv.x;
-    v = texture->height*(1-uv.y);
+    vec2 *vt1 = darray_index(scene->tex_coords, face->u),
+         *vt2 = darray_index(scene->tex_coords, face->v),
+         *vt3 = darray_index(scene->tex_coords, face->w),
+         vt;
+    attyr_init_mat2x3(&coords, vt1, vt2, vt3);
+    attyr_mult_mat2x3_vec3(&coords, barycentric, &vt);
+    u = texture->width*vt.x;
+    v = texture->height*(1-vt.y);
 
     attyr_init_vec3(output, texture_lookup(texture, u, v, 0),
                             texture_lookup(texture, u, v, 1),
@@ -148,11 +149,11 @@ void frag_shader(vec4 *output, vec3 *coords, vec3 *pos, void *data)
     render_state_t *state = data;
     scene_t *scene = state->scene;
     object_t *object = darray_index(scene->objects, state->object);
-    texture_t *texture = object->texture;
+    texture_t *texture = darray_index(scene->textures, object->texture);
     face_t *face = darray_index(object->faces, state->face);
     vec3 color, illum;
 
-    calc_texture_fragment(texture, &color, &state->texture_coords, coords);
+    calc_texture_fragment(&color, texture, face, coords, scene);
     calc_illumination(&illum, face, coords, scene);
 
     attyr_init_vec4(output, color.x*illum.x, color.y*illum.y, color.z*illum.z, 1.0);
@@ -189,7 +190,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < 700; i++) {
         for (int i = 0; i < scene->objects->len; i++) {
             object_t *object = darray_index(scene->objects, i);
-            float t = 5.7/(1+exp(3-state->time));
+            float t = 5.4/(1+exp(3-state->time));
             mat4 rotate = {
                  cos(t), 0, sin(t), 0,
                    0,    1,   0,    0,
@@ -198,7 +199,7 @@ int main(int argc, char **argv)
              }, translate = {
                  1, 0, 0, 0,
                  0, 1, 0, -10+1.5*t,
-                 0, 0, 1, -22+3.5*t,
+                 0, 0, 1, -22+3.8*t,
                  0, 0, 0, 1
              }, perspective = {
                   1, 0, 0, 0,

@@ -195,11 +195,11 @@ int main(int argc, char **argv)
     /* hide the cursor */
     printf("\x1b[?25l");
 
-    for (int i = 0; i < 700; i++) {
+    for (int i = 0; i < 1000; i++) {
         for (int i = 0; i < scene->objects->len; i++) {
             /* calculate the transformations to perform on the current object */
             object_t *object = darray_index(scene->objects, i);
-            float t = 5.4/(1+exp(3-state->time)); /* smooth interpolation */
+            float t = 5.3/(1+exp(3-state->time)); /* smooth interpolation */
             mat4 rotate = {
                 cos(t), 0, sin(t), 0,
                   0,    1,   0,    0,
@@ -220,6 +220,14 @@ int main(int argc, char **argv)
              /* combine the transformations into a single matrix */
              attyr_mult_mat4x4_4x4(&translate, &rotate, &translate);
              attyr_mult_mat4x4_4x4(&perspective, &translate, &object->transform);
+        }
+
+        for (int i = 0; i < scene->lights->len; i++) {
+            light_t *light = darray_index(scene->lights, i);
+
+            if (state->time > 6) {
+                attyr_scale_vec3(&light->color, 0.99);
+            }
         }
 
         /* move the cursor to the upper left corner. This is faster than

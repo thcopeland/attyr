@@ -67,7 +67,7 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
     attyr_vec3 coords;
 
     while (vert_shader(verts, verts+1, verts+2, shader_data)) {
-        attyr_vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos, clip_pos;
+        attyr_vec3 l1_coeff, l2_coeff, l3_coeff, w_coeff, pos;
         attyr_mat3x3 h2d_verts = {
             verts->x, (verts+1)->x, (verts+2)->x,
             verts->y, (verts+1)->y, (verts+2)->y,

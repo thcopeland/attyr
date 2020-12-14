@@ -64,3 +64,19 @@ void attyr_render_ascii_8bit(attyr_framebuffer_t *buff)
         printf("\x1b[0m\n");
     }
 }
+
+void attyr_render_ascii_simple(attyr_framebuffer_t *buff)
+{
+    static char map[] = " .-=+*#%@";
+
+    for (int i=buff->height-1; i>=0; i--) {
+        printf("\x1b[1;40;37m");
+        for (int j=0; j<buff->width; j++) {
+            attyr_color_t *color = &buff->color[i*buff->width + j];
+            unsigned char gray = 0.2126*color->r + 0.7152*color->g + 0.0722*color->b;
+
+            printf("%c", map[sizeof(map)*gray/255]);
+        }
+        printf("\x1b[0m\n");
+    }
+}

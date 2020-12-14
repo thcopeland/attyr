@@ -11,4 +11,6 @@ void attyr_render_ascii_truecolor(attyr_framebuffer_t *buffer);
 
 void attyr_render_ascii_8bit(attyr_framebuffer_t *buffer);
 
+void attyr_render_ascii_simple(attyr_framebuffer_t *buff);
+
 #endif

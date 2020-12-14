@@ -1,10 +1,12 @@
-## ATTYR
+## About
 
 ATTYR is pronounced "attire" and stands for A TeleTYpe Rasterizer. ATTYR is a single-threaded software rasterizer, written in C, that roughly follows the OpenGL vertex shader + fragment shader architecture and can be used to output to a terminal. Despite the name, ATTYR writes images to a framebuffer, so you can render to anything you want.
 
 ## Why?
 
 ATTYR adds a whole new dimension to terminal graphics.
+
+![A wizard watches the sunset](https://github.com/thcopeland/attyr/blob/master/samples/assets/scene.gif)
 
 ## Requirements
 

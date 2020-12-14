@@ -1,6 +1,11 @@
 #ifndef ATTYR_SHORT_NAMES
 #define ATTYR_SHORT_NAMES
 
+/*
+ * Unless you're using another matrix library, it's redundant to prepend all
+ * these types with `attyr_`.
+ */
+
 typedef attyr_vec2 vec2;
 typedef attyr_vec3 vec3;
 typedef attyr_vec4 vec4;

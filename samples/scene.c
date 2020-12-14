@@ -80,6 +80,7 @@ void calc_texture_fragment(vec3 *output,
  */
 void calc_illumination(vec3 *output, face_t *face, vec3 *barycentric, scene_t *scene)
 {
+    static float ambience = 0.2;
     /* load the normals and vertex coordinates */
     vec4 *v1 = darray_index(scene->vertices, face->a),
          *v2 = darray_index(scene->vertices, face->b),
@@ -99,8 +100,8 @@ void calc_illumination(vec3 *output, face_t *face, vec3 *barycentric, scene_t *s
         n1->z, n2->z, n3->z
     };
 
-    /* the illumination is initially 100% bright everywhere */
-    attyr_init_vec3(output, 1, 1, 1);
+    /* the illumination is initially dark everywhere */
+    attyr_init_vec3(output, 0, 0, 0);
 
     /* interpolate the position and normals to the point specified by the
        barycentric coordinates */
@@ -120,15 +121,18 @@ void calc_illumination(vec3 *output, face_t *face, vec3 *barycentric, scene_t *s
         /* calculate the projection of the light vector onto the normal vector.
            If they are parallel or near parallel, the light is "head on" and
            this will be around 1.
-           The 0.8+0.2 gives some ambient light.
          */
-        intensity = fmax(0, attyr_dot_vec3(&dist, &normal))*0.8+0.2;
+        intensity = fmax(0, attyr_dot_vec3(&dist, &normal));
 
         /* account for the intensity of each color */
-        output->x *= light->color.x * intensity;
-        output->y *= light->color.y * intensity;
-        output->z *= light->color.z * intensity;
+        output->x += light->color.x * intensity;
+        output->y += light->color.y * intensity;
+        output->z += light->color.z * intensity;
     }
+
+    output->x = output->x*(1-ambience) + ambience;
+    output->y = output->y*(1-ambience) + ambience;
+    output->z = output->z*(1-ambience) + ambience;
 }
 
 /*
@@ -152,7 +156,10 @@ void frag_shader(vec4 *output, vec3 *coords, vec3 *pos, void *data)
     calc_illumination(&illum, face, coords, scene);
 
     /* output the resulting color */
-    attyr_init_vec4(output, color.x*illum.x, color.y*illum.y, color.z*illum.z, 1.0);
+    attyr_init_vec4(output, fmin(1, color.x*illum.x),
+                            fmin(1, color.y*illum.y),
+                            fmin(1, color.z*illum.z),
+                            1.0);
 }
 
 int main(int argc, char **argv)
@@ -183,7 +190,7 @@ int main(int argc, char **argv)
     set_texture_by_name(scene, "Ground", ground_tex);
     set_texture_by_name(scene, "Plant", plant_tex);
 
-    add_light(scene, 1, 1, 1, 0, 2, 2);
+    add_light(scene, 1.5, 0.6, 0.1, 0, 0, 20);
 
     /* hide the cursor */
     printf("\x1b[?25l");

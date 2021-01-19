@@ -16,9 +16,9 @@ ATTYR doesn't depend on any other libraries. To build the source (currently, thi
 sudo apt install automake libtool
 ```
 
-You'll also probably want a fast terminal emulator that supports [truecolor](https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit) and Unicode. `gnome-terminal` is a good candidate, and is preinstalled on Ubuntu. I believe `xterm` also works.
+You'll also probably want a fast terminal emulator that supports [truecolor](https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit) and Unicode. `gnome-terminal` is a good candidate, and is preinstalled on Ubuntu. `xterm` also works.
 
-However, the best terminal emulator for ATTYR is [Alacritty](https://github.com/alacritty/alacritty), "the fastest terminal emulator in existence". ATTYR is fast, and quite often, the biggest bottleneck is actually the terminal. ATTYR runs several times as faster on Alacritty as `gnome-terminal`. At the time of writing, however, the Alacritty Snap package is broken, so you'll have to build Alacritty from source. (When running the ATTYR samples, you may notice that Alacritty renders Unicode LOW HALF BLOCK characters incorrectly, see [here](https://github.com/alacritty/alacritty/issues/2500) for a fix).
+However, the best terminal emulator for ATTYR is [Alacritty](https://github.com/alacritty/alacritty), "the fastest terminal emulator in existence". ATTYR is fast, and often the biggest bottleneck is actually the terminal. ATTYR runs several times as faster on Alacritty as `gnome-terminal`. At the time of writing, however, the Alacritty Snap package is broken, so you'll have to build Alacritty from source. (When running the ATTYR samples, you may notice that Alacritty renders Unicode LOW HALF BLOCK characters incorrectly, see [here](https://github.com/alacritty/alacritty/issues/2500) for a fix).
 
 ## Installation
 
@@ -49,7 +49,7 @@ After you install ATTYR, you can run the samples! This is a good way to check yo
 * Perspective and orthographic cameras are both possible.
 * Includes a small matrix library.
 * Many software rasterizers drop near-plane tris (faces partially in front of and behind the camera) instead of clipping them properly. This is a serious problem if you're writing a game. ATTYR uses the [Olano-Greer rasterization algorithm](https://www.csee.umbc.edu/~olano/papers/2dh-tri/2dh-tri.pdf) and handles near-plane tris correctly and efficiently.
-* ATTYR is fast (particularly on Alacritty). In one of the earlier tests, ATTYR rendered 219,497 faces at 50 FPS at a resolution of 136x70.
+* ATTYR is fast (particularly on Alacritty). In one test, ATTYR rendered 219,497 faces at 50 FPS at a resolution of 136x70.
 
 ## Usage
 
@@ -68,7 +68,7 @@ typedef int (*attyr_vertex_shader_f)(attyr_vec4 *vert1,
                                      void *data);
 ```
 
-A vertex shader is an iterator. It loads three vertices belonging to a single face, generally from `data`, and copies them to `vert1`, `vert2`, and `vert3`. A vertex shader is the place to apply transformations, including the perspective or orthographic camera transforms. If there are no vertices remaining to render, it returns `0`, otherwise, `1`.
+A vertex shader is an iterator. It loads three vertices belonging to a single face, generally from `data`, and copies them to `vert1`, `vert2`, and `vert3`. A vertex shader is the place to apply transformations, including the perspective or orthographic camera transforms. If there are no vertices remaining to render, it returns `0`, otherwise, `1`. (Implementation note: `vert1`, `vert2`, `vert3` are stored in consecutive memory addresses, i.e. `vert1+1 == vert2`.)
 
 A vertex shader provides ATTYR with vertices of a triangle to draw, a fragment shader determines the colors of the triangle.
 

@@ -169,7 +169,7 @@ int main(int argc, char **argv)
 
     /* create a new framebuffer. Adjust the width and height as necessary for
        your terminal. */
-    attyr_framebuffer_t *framebuffer = init_framebuffer(136, 70);
+    attyr_framebuffer_t *framebuffer = attyr_init_framebuffer(136, 70);
     render_state_t *state = init_render_state(scene);
     int wizard_tex = load_texture("assets/Wizard_Texture.raw", 1024, 1024, 3, scene),
         staff_tex = load_texture("assets/Wizard_Staff_Texture.raw", 512, 512, 3, scene),
@@ -254,6 +254,6 @@ int main(int argc, char **argv)
 
     /* clean up */
     free_scene(scene);
-    free_framebuffer(framebuffer);
+    attyr_free_framebuffer(framebuffer);
     free(state);
 }

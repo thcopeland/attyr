@@ -10,16 +10,6 @@ typedef struct {
 } render_state_t;
 
 /*
- * Allocate and initialize a framebuffer.
- */
-attyr_framebuffer_t *init_framebuffer(unsigned int width, unsigned int height);
-
-/*
- * Free a framebuffer.
- */
-void free_framebuffer(attyr_framebuffer_t *framebuffer);
-
-/*
  * Reset a render state so it can be reused in the next frame.
  */
 void reset_render_state(render_state_t *state);

@@ -55,7 +55,7 @@ After you install ATTYR, you can run the samples! This is a good way to check yo
 
 ### Matrices and Vectors
 
-For speed, ATTYR implements fixed-size matrices. All matrix dimensions supported in OpenGL are supported in ATTYR: 2x2, 2x3, 2x4, 3x2, 3x3, 3x4, 4x2, 4x3, 4x4, and vectors, 2x1, 3x1, and 4x1. If you're writing code for low-memory devices, you might want to consider dropping the 2x2, 2x4, 3x2, 4x2, 4x3, and 4x4 matrices, which are mostly included for completeness. See `src/matrices.h` for available operations.
+For speed, ATTYR implements fixed-size matrices. All matrix dimensions supported in OpenGL are supported in ATTYR: 2x2, 2x3, 2x4, 3x2, 3x3, 3x4, 4x2, 4x3, 4x4, and vectors, 2x1, 3x1, and 4x1. If you're writing code for low-memory devices, you might want to consider dropping the 2x2, 2x4, 3x2, 4x2, and 4x3 matrices, which are mostly included for completeness. See `src/matrices.h` for available operations.
 
 ### Rasterization
 

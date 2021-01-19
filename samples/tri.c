@@ -10,7 +10,6 @@
  */
 #define RENDER_WIDTH 120
 #define RENDER_HEIGHT 60
-#define RENDER_AREA (RENDER_WIDTH*RENDER_HEIGHT)
 
 /*
  * This structure allows us to share data between frames and between vertex
@@ -117,14 +116,7 @@ void frag_shader(attyr_vec4 *color, attyr_vec3 *coords, attyr_vec3 *pos, void *d
 int main(int argc, char **argv)
 {
     /* initialize a framebuffer */
-    attyr_color_t color_buffer[RENDER_AREA];
-    float depth_buffer[RENDER_AREA];
-    attyr_framebuffer_t framebuffer = {
-        .color = color_buffer, /* stores the color of each fragment */
-        .depth = depth_buffer, /* stores the depth of each fragment */
-        .width = RENDER_WIDTH,
-        .height = RENDER_HEIGHT
-    };
+    attyr_framebuffer_t *framebuffer = attyr_init_framebuffer(RENDER_WIDTH, RENDER_HEIGHT);
 
     /* initialize the render state */
     struct renderstate state = {
@@ -141,13 +133,13 @@ int main(int argc, char **argv)
         printf("\x1b[H");
 
         /* clear the framebuffer */
-        attyr_reset_framebuffer(&framebuffer);
+        attyr_reset_framebuffer(framebuffer);
 
         /* rasterize everything to the framebuffer */
-        attyr_rasterize(&framebuffer, vert_shader, frag_shader, &state);
+        attyr_rasterize(framebuffer, vert_shader, frag_shader, &state);
 
         /* output the framebuffer to the screen */
-        attyr_render_truecolor(&framebuffer);
+        attyr_render_truecolor(framebuffer);
 
         /* increment time and reset the face index */
         state.time += 0.02;
@@ -159,4 +151,7 @@ int main(int argc, char **argv)
 
     /* show the cursor */
     printf("\x1b[?25h");
+
+    /* clean up */
+    attyr_free_framebuffer(framebuffer);
 }

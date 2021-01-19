@@ -1,5 +1,6 @@
 #include <float.h>
 #include <math.h>
+#include <stdlib.h>
 #include "rasterize.h"
 
 #define max3(a, b, c) fmax(fmax(a, b), c)
@@ -118,6 +119,34 @@ void attyr_rasterize(attyr_framebuffer_t *buff,
             }
         }
     }
+}
+
+attyr_framebuffer_t *attyr_init_framebuffer(unsigned int width, unsigned int height)
+{
+    attyr_framebuffer_t *buff = malloc(sizeof(attyr_framebuffer_t));
+
+    if (buff) {
+        buff->width = width;
+        buff->height = height;
+        buff->color = malloc(sizeof(buff->color[0])*width*height);
+        buff->depth = malloc(sizeof(buff->depth[0])*width*height);
+
+        if (!buff->color || !buff->depth) {
+            attyr_free_framebuffer(buff);
+            return NULL;
+        }
+
+        attyr_reset_framebuffer(buff);
+    }
+
+    return buff;
+}
+
+void attyr_free_framebuffer(attyr_framebuffer_t *buff)
+{
+    free(buff->color);
+    free(buff->depth);
+    free(buff);
 }
 
 void attyr_reset_framebuffer(attyr_framebuffer_t *buff)

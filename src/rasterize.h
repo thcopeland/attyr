@@ -75,6 +75,16 @@ void attyr_rasterize(attyr_framebuffer_t *buffer,
                      void *shader_data);
 
 /*
+ * Allocate and initialize a framebuffer for rendering. If the allocation fails,
+ * returns null.
+ */
+attyr_framebuffer_t *attyr_init_framebuffer(unsigned int width, unsigned int height);
+
+/*
+ * Free the memory held by a framebuffer, including the depth and color buffers.
+ */
+void attyr_free_framebuffer(attyr_framebuffer_t *framebuffer);
+/*
  * Clear a framebuffer in preparation for another rasterization.
  */
 void attyr_reset_framebuffer(attyr_framebuffer_t *buff);

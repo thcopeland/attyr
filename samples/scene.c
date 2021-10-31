@@ -8,6 +8,9 @@
 /*
  * The job of a vertex shader is to fetch and perform transformations on object
  * vertices for the rasterizer.
+ *
+ * This vertex shader iterates over all the objects. This is not necessary, and
+ * it could be more efficient to perform a separate draw call for each object.
  */
 int vert_shader(attyr_vec4 *v1, attyr_vec4 *v2, attyr_vec4 *v3, void *data)
 {
@@ -116,7 +119,7 @@ void calc_illumination(vec3 *output, face_t *face, vec3 *barycentric, scene_t *s
         /* calculate the unit vector between the light source and point on the face
             that we're rendering */
         attyr_sub_vec3(&light->position, &position, &dist);
-        attyr_scale_vec3(&dist, 1/attyr_len_vec3(&dist));
+        attyr_normalize_vec3(&dist);
 
         /* calculate the projection of the light vector onto the normal vector.
            If they are parallel or near parallel, the light is "head on" and
@@ -200,22 +203,10 @@ int main(int argc, char **argv)
             /* calculate the transformations to perform on the current object */
             object_t *object = darray_index(scene->objects, i);
             float t = 5.3/(1+exp(3-state->time)); /* smooth interpolation */
-            mat4 rotate = {
-                cos(t), 0, sin(t), 0,
-                  0,    1,   0,    0,
-                -sin(t),0, cos(t), 0,
-                  0,    0,   0,    1
-            }, translate = {
-                1, 0, 0, 0,
-                0, 1, 0, -10+1.5*t,
-                0, 0, 1, -22+3.8*t,
-                0, 0, 0, 1
-            }, perspective = {
-                1, 0, 0, 0,
-                0, 2, 0, 0,
-                0, 0, 1, 0,
-                0, 0, -1, 0
-             };
+            mat4 rotate, translate, perspective;
+            attyr_rotate_y(t, &rotate);
+            attyr_translate(&(vec3){0, -10+1.5*t, -22+3.8*t}, &translate);
+            attyr_perspective(M_PI/4, 2, 0, &perspective);
 
              /* combine the transformations into a single matrix */
              attyr_mult_mat4x4_4x4(&translate, &rotate, &translate);

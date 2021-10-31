@@ -18,6 +18,18 @@ void test_duplication_mat4(void)
     assert_mat4x4_eq(a, b, "mat4 duplication");
 }
 
+void test_diagonal_matrices(void) {
+    attyr_mat2x2 actual2, exp2 = { 1,0,0,1 };
+    attyr_mat3x3 actual3, exp3 = { 1,0,0,0,1,0,0,0,1 };
+    attyr_mat4x4 actual4, exp4 = { 3,0,0,0,0,3,0,0,0,0,3,0,0,0,0,3 };
+    attyr_diag_mat2x2(1, &actual2);
+    attyr_diag_mat3x3(1, &actual3);
+    attyr_diag_mat4x4(3, &actual4);
+    assert_mat2x2_eq(actual2, exp2, "mat2 diagonal init");
+    assert_mat3x3_eq(actual3, exp3, "mat3 diagonal init");
+    assert_mat4x4_eq(actual4, exp4, "mat4 diagonal init");
+}
+
 void test_scaling_mat3(void)
 {
     attyr_mat3x3 a = { 4,6,8,3,5,2,9,5,4 };
@@ -135,10 +147,54 @@ void test_product_mat4vec4(void)
     assert_vec4_eq(c, exp, "mat4x4 * vec4 product");
 }
 
+void test_rotation_matrices(void)
+{
+    attyr_vec4 vec = { 1, 2, 1, 1},
+               exp1 = { 1.824859, 1.175141, 1.135312, 1 },
+               exp2 = { 1.824859, 0.486986, 1.559723, 1 },
+               exp3 = { 0.853693, 0.486986, 2.243669, 1 },
+               exp4 = { 0.051468, 0.981478, 2.243669, 1 };
+    attyr_mat4x4 rot, rot_x, rot_y, rot_z;
+    attyr_rotate(&(attyr_vec3) { 0.7071, 0.7071, 0}, 1, &rot);
+    attyr_rotate_x(0.5, &rot_x);
+    attyr_rotate_y(-0.5, &rot_y);
+    attyr_rotate_z(1, &rot_z);
+    attyr_mult_mat4x4_vec4(&rot, &vec, &vec);
+    assert_vec4_eq(vec, exp1, "angle-axis rotation");
+    attyr_mult_mat4x4_vec4(&rot_x, &vec, &vec);
+    assert_vec4_eq(vec, exp2, "x-axis rotation");
+    attyr_mult_mat4x4_vec4(&rot_y, &vec, &vec);
+    assert_vec4_eq(vec, exp3, "y-axis rotation");
+    attyr_mult_mat4x4_vec4(&rot_z, &vec, &vec);
+    assert_vec4_eq(vec, exp4, "z-axis rotation");
+}
+
+void test_translation_matrices(void)
+{
+    attyr_vec4 vec = { 1, 0, -1, 1 },
+               exp = { -4, 3, -2, 1 };
+    attyr_mat4x4 trans;
+    attyr_translate(&(attyr_vec3) { -5, 3, -1 }, &trans);
+    attyr_mult_mat4x4_vec4(&trans, &vec, &vec);
+    assert_vec4_eq(vec, exp, "translation");
+}
+
+void test_scale_matrices(void)
+{
+    attyr_vec4 vec = { 1, 1, -1, 1 },
+               exp = { 4, -1, 3, 1 };
+    attyr_mat4x4 scale;
+    attyr_scale(&(attyr_vec3) { 4, -1, -3 }, &scale);
+    attyr_mult_mat4x4_vec4(&scale, &vec, &vec);
+    assert_vec4_eq(vec, exp, "scale");
+}
+
 int main(int argc, char **argv)
 {
     test_duplication_mat3();
     test_duplication_mat4();
+
+    test_diagonal_matrices();
 
     test_scaling_mat3();
     test_scaling_mat4();
@@ -156,6 +212,10 @@ int main(int argc, char **argv)
     test_product_mat4vec4();
 
     test_invert_mat3();
+
+    test_rotation_matrices();
+    test_translation_matrices();
+    test_scale_matrices();
 
     return 0;
 }

@@ -61,43 +61,27 @@ int vert_shader(vec4 *out1, vec4 *out2, vec4 *out3, void *data)
              *in3 = vertices + faces[state->face + 2];
 
         /* Some transformation matrices */
-         mat4 rotateY = {
-              cos(state->time),  0, sin(state->time), 0,
-                      0,         1,         0,        0,
-              -sin(state->time), 0, cos(state->time), 0,
-                       0,        0,         0,        1
-          }, rotateX = {
-               1,          0,                   0,         0,
-               0, cos(state->time/2),  sin(state->time/2), 0,
-               0, -sin(state->time/2), cos(state->time/2), 0,
-               0,           0,                  0,         1
-           }, translate = {
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, -0.8,
-            0, 0, 0, 1
-         }, perspective = {
-            1, 0, 0, 0,
-            0, 2, 0, 0,
-            0, 0, 1, 0,
-            0, 0, -1, 0
-          };
+        mat4 rotateX, rotateY, translate, perspective;
+        attyr_rotate_x(state->time/2, &rotateX);
+        attyr_rotate_y(state->time, &rotateY);
+        attyr_translate(&(vec3) { 0, 0, -0.8 }, &translate);
+        attyr_perspective(M_PI/4, 2, 0, &perspective);
 
-          /* build a single cumulative transformation matrix */
-          attyr_mult_mat4x4_4x4(&rotateX, &rotateY, &rotateX);
-          attyr_mult_mat4x4_4x4(&translate, &rotateX, &translate);
-          attyr_mult_mat4x4_4x4(&perspective, &translate, &perspective);
+        /* build a single cumulative transformation matrix */
+        attyr_mult_mat4x4_4x4(&rotateX, &rotateY, &rotateX);
+        attyr_mult_mat4x4_4x4(&translate, &rotateX, &translate);
+        attyr_mult_mat4x4_4x4(&perspective, &translate, &perspective);
 
-          /* multiply the matrix by an input vertex and store the result in an
-             output matrix */
-          attyr_mult_mat4x4_vec4(&perspective, in1, out1);
-          attyr_mult_mat4x4_vec4(&perspective, in2, out2);
-          attyr_mult_mat4x4_vec4(&perspective, in3, out3);
+        /* multiply the matrix by an input vertex and store the result in an
+           output matrix */
+        attyr_mult_mat4x4_vec4(&perspective, in1, out1);
+        attyr_mult_mat4x4_vec4(&perspective, in2, out2);
+        attyr_mult_mat4x4_vec4(&perspective, in3, out3);
 
-          state->face += 3;
+        state->face += 3;
 
-          /* returning 1 indicates that there's a vertex to render */
-          return 1;
+        /* returning 1 indicates that there's a vertex to render */
+        return 1;
      }
 }
 

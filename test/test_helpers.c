@@ -11,6 +11,12 @@ void assert_float_eq(float actual, float expected, char *msg)
     }
 }
 
+void assert_vec2_eq(attyr_vec2 v, attyr_vec2 exp, char *msg)
+{
+    assert_float_eq(v.x, exp.x, msg);
+    assert_float_eq(v.y, exp.y, msg);
+}
+
 void assert_vec3_eq(attyr_vec3 v, attyr_vec3 exp, char *msg)
 {
     assert_float_eq(v.x, exp.x, msg);
@@ -24,6 +30,14 @@ void assert_vec4_eq(attyr_vec4 v, attyr_vec4 exp, char *msg)
     assert_float_eq(v.y, exp.y, msg);
     assert_float_eq(v.z, exp.z, msg);
     assert_float_eq(v.w, exp.w, msg);
+}
+
+void assert_mat2x2_eq(attyr_mat2x2 m, attyr_mat2x2 exp, char *msg)
+{
+    assert_float_eq(m.m11, exp.m11, msg);
+    assert_float_eq(m.m12, exp.m12, msg);
+    assert_float_eq(m.m21, exp.m21, msg);
+    assert_float_eq(m.m22, exp.m22, msg);
 }
 
 void assert_mat3x3_eq(attyr_mat3x3 m, attyr_mat3x3 exp, char *msg)

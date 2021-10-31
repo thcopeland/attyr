@@ -147,6 +147,47 @@ void attyr_init_mat4x4(attyr_mat4x4 *m, attyr_vec4 *col1, attyr_vec4 *col2, atty
 	m->m44 = col4->w;
 }
 
+void attyr_diag_mat2x2(float d, attyr_mat2x2 *dst)
+{
+	dst->m11 = d;
+	dst->m12 = 0;
+	dst->m21 = 0;
+	dst->m22 = d;
+}
+
+void attyr_diag_mat3x3(float d, attyr_mat3x3 *dst)
+{
+	dst->m11 = d;
+	dst->m12 = 0;
+	dst->m13 = 0;
+	dst->m21 = 0;
+	dst->m22 = d;
+	dst->m23 = 0;
+	dst->m31 = 0;
+	dst->m32 = 0;
+	dst->m33 = d;
+}
+
+void attyr_diag_mat4x4(float d, attyr_mat4x4 *dst)
+{
+	dst->m11 = d;
+	dst->m12 = 0;
+	dst->m13 = 0;
+	dst->m14 = 0;
+	dst->m21 = 0;
+	dst->m22 = d;
+	dst->m23 = 0;
+	dst->m24 = 0;
+	dst->m31 = 0;
+	dst->m32 = 0;
+	dst->m33 = d;
+	dst->m34 = 0;
+	dst->m41 = 0;
+	dst->m42 = 0;
+	dst->m43 = 0;
+	dst->m44 = d;
+}
+
 void attyr_dup_vec2(attyr_vec2 *src, attyr_vec2 *dst)
 {
 	*dst = *src;
@@ -241,6 +282,36 @@ void attyr_scale_vec4(attyr_vec4 *v, float s)
 	v->y *= s;
 	v->z *= s;
 	v->w *= s;
+}
+
+float attyr_normalize_vec2(attyr_vec2 *v)
+{
+	float len = attyr_len_vec2(v);
+	if (len != 0) {
+		attyr_scale_vec2(v, 1/len);
+		return 1;
+	}
+	return 0;
+}
+
+float attyr_normalize_vec3(attyr_vec3 *v)
+{
+	float len = attyr_len_vec3(v);
+	if (len != 0) {
+		attyr_scale_vec3(v, 1/len);
+		return 1;
+	}
+	return 0;
+}
+
+float attyr_normalize_vec4(attyr_vec4 *v)
+{
+	float len = attyr_len_vec4(v);
+	if (len != 0) {
+		attyr_scale_vec4(v, 1/len);
+		return 1;
+	}
+	return 0;
 }
 
 void attyr_scale_mat2x2(attyr_mat2x2 *m, float s)
@@ -651,67 +722,95 @@ float attyr_dot_vec4(attyr_vec4 *a, attyr_vec4 *b)
 	return a->x*b->x + a->y*b->y + a->z*b->z + a->w*b->w;
 }
 
+void attyr_cross_vec3(attyr_vec3 *a, attyr_vec3 *b, attyr_vec3 *dst)
+{
+	float ax = a->x, ay = a->y, az = a->z,
+		  bx = b->x, by = b->y, bz = b->z;
+
+	dst->x = ay*bz - az*by;
+    dst->y = az*bx - ax*bz;
+	dst->z = ax*by - ay*bx;
+}
+
 void attyr_mult_mat2x2_vec2(attyr_mat2x2 *m, attyr_vec2 *v, attyr_vec2 *dst)
 {
-	dst->x = m->m11*v->x + m->m12*v->y;
-	dst->y = m->m21*v->x + m->m22*v->y;
+	float vx = v->x, vy = v->y;
+
+	dst->x = m->m11*vx + m->m12*vy;
+	dst->y = m->m21*vx + m->m22*vy;
 }
 
 void attyr_mult_mat2x3_vec3(attyr_mat2x3 *m, attyr_vec3 *v, attyr_vec2 *dst)
 {
-	dst->x = m->m11*v->x + m->m12*v->y + m->m13*v->z;
-	dst->y = m->m21*v->x + m->m22*v->y + m->m23*v->z;
+	float vx = v->x, vy = v->y, vz = v->z;
+
+	dst->x = m->m11*vx + m->m12*vy + m->m13*vz;
+	dst->y = m->m21*vx + m->m22*vy + m->m23*vz;
 }
 
 void attyr_mult_mat2x4_vec4(attyr_mat2x4 *m, attyr_vec4 *v, attyr_vec2 *dst)
 {
-	dst->x = m->m11*v->x + m->m12*v->y + m->m13*v->z + m->m14*v->w;
-	dst->y = m->m21*v->x + m->m22*v->y + m->m23*v->z + m->m24*v->w;
+	float vx = v->x, vy = v->y, vz = v->z, vw = v->w;
+
+	dst->x = m->m11*vx + m->m12*vy + m->m13*vz + m->m14*vw;
+	dst->y = m->m21*vx + m->m22*vy + m->m23*vz + m->m24*vw;
 }
 
 void attyr_mult_mat3x2_vec2(attyr_mat3x2 *m, attyr_vec2 *v, attyr_vec3 *dst)
 {
-	dst->x = m->m11*v->x + m->m12*v->y;
-	dst->y = m->m21*v->x + m->m22*v->y;
-	dst->z = m->m31*v->x + m->m32*v->y;
+	float vx = v->x, vy = v->y;
+
+	dst->x = m->m11*vx + m->m12*vy;
+	dst->y = m->m21*vx + m->m22*vy;
+	dst->z = m->m31*vx + m->m32*vy;
 }
 
 void attyr_mult_mat3x3_vec3(attyr_mat3x3 *m, attyr_vec3 *v, attyr_vec3 *dst)
 {
-	dst->x = m->m11*v->x + m->m12*v->y + m->m13*v->z;
-	dst->y = m->m21*v->x + m->m22*v->y + m->m23*v->z;
-	dst->z = m->m31*v->x + m->m32*v->y + m->m33*v->z;
+	float vx = v->x, vy = v->y, vz = v->z;
+
+	dst->x = m->m11*vx + m->m12*vy + m->m13*vz;
+	dst->y = m->m21*vx + m->m22*vy + m->m23*vz;
+	dst->z = m->m31*vx + m->m32*vy + m->m33*vz;
 }
 
 void attyr_mult_mat3x4_vec4(attyr_mat3x4 *m, attyr_vec4 *v, attyr_vec3 *dst)
 {
-	dst->x = m->m11*v->x + m->m12*v->y + m->m13*v->z + m->m14*v->w;
-	dst->y = m->m21*v->x + m->m22*v->y + m->m23*v->z + m->m24*v->w;
-	dst->z = m->m31*v->x + m->m32*v->y + m->m33*v->z + m->m34*v->w;
+	float vx = v->x, vy = v->y, vz = v->z, vw = v->w;
+
+	dst->x = m->m11*vx + m->m12*vy + m->m13*vz + m->m14*vw;
+	dst->y = m->m21*vx + m->m22*vy + m->m23*vz + m->m24*vw;
+	dst->z = m->m31*vx + m->m32*vy + m->m33*vz + m->m34*vw;
 }
 
 void attyr_mult_mat4x2_vec2(attyr_mat4x2 *m, attyr_vec2 *v, attyr_vec4 *dst)
 {
-	dst->x = m->m11*v->x + m->m12*v->y;
-	dst->y = m->m21*v->x + m->m22*v->y;
-	dst->z = m->m31*v->x + m->m32*v->y;
-	dst->w = m->m41*v->x + m->m42*v->y;
+	float vx = v->x, vy = v->y;
+
+	dst->x = m->m11*vx + m->m12*vy;
+	dst->y = m->m21*vx + m->m22*vy;
+	dst->z = m->m31*vx + m->m32*vy;
+	dst->w = m->m41*vx + m->m42*vy;
 }
 
 void attyr_mult_mat4x3_vec3(attyr_mat4x3 *m, attyr_vec3 *v, attyr_vec4 *dst)
 {
-	dst->x = m->m11*v->x + m->m12*v->y + m->m13*v->z;
-	dst->y = m->m21*v->x + m->m22*v->y + m->m23*v->z;
-	dst->z = m->m31*v->x + m->m32*v->y + m->m33*v->z;
-	dst->w = m->m41*v->x + m->m42*v->y + m->m43*v->z;
+	float vx = v->x, vy = v->y, vz = v->z;
+
+	dst->x = m->m11*vx + m->m12*vy + m->m13*vz;
+	dst->y = m->m21*vx + m->m22*vy + m->m23*vz;
+	dst->z = m->m31*vx + m->m32*vy + m->m33*vz;
+	dst->w = m->m41*vx + m->m42*vy + m->m43*vz;
 }
 
 void attyr_mult_mat4x4_vec4(attyr_mat4x4 *m, attyr_vec4 *v, attyr_vec4 *dst)
 {
-	dst->x = m->m11*v->x + m->m12*v->y + m->m13*v->z + m->m14*v->w;
-	dst->y = m->m21*v->x + m->m22*v->y + m->m23*v->z + m->m24*v->w;
-	dst->z = m->m31*v->x + m->m32*v->y + m->m33*v->z + m->m34*v->w;
-	dst->w = m->m41*v->x + m->m42*v->y + m->m43*v->z + m->m44*v->w;
+	float vx = v->x, vy = v->y, vz = v->z, vw = v->w;
+
+	dst->x = m->m11*vx + m->m12*vy + m->m13*vz + m->m14*vw;
+	dst->y = m->m21*vx + m->m22*vy + m->m23*vz + m->m24*vw;
+	dst->z = m->m31*vx + m->m32*vy + m->m33*vz + m->m34*vw;
+	dst->w = m->m41*vx + m->m42*vy + m->m43*vz + m->m44*vw;
 }
 
 void attyr_mult_mat2x2_2x2(attyr_mat2x2 *a, attyr_mat2x2 *b, attyr_mat2x2 *dst)
@@ -1278,4 +1377,184 @@ float attyr_invert_mat3x3(attyr_mat3x3 *m)
     }
 
     return 0;
+}
+
+void attyr_rotate(attyr_vec3 *axis, float angle, attyr_mat4x4 *dst)
+{
+	float c = cos(angle), s = sin(angle), t = 1-c;
+	float x = axis->x, y = axis->y, z = axis->z;
+
+	dst->m11 = x*x*t + c;
+	dst->m12 = y*x*t - z*s;
+	dst->m13 = z*x*t + y*s;
+	dst->m14 = 0;
+	dst->m21 = x*y*t + z*s;
+	dst->m22 = y*y*t + c;
+	dst->m23 = z*y*t - x*s;
+	dst->m24 = 0;
+	dst->m31 = x*z*t - y*s;
+	dst->m32 = y*z*t + x*s;
+	dst->m33 = z*z*t + c;
+	dst->m34 = 0;
+	dst->m41 = 0;
+	dst->m42 = 0;
+	dst->m43 = 0;
+	dst->m44 = 1;
+}
+
+void attyr_rotate_x(float angle, attyr_mat4x4 *dst)
+{
+	float c = cos(angle), s = sin(angle);
+
+	dst->m11 = 1;
+	dst->m12 = 0;
+	dst->m13 = 0;
+	dst->m14 = 0;
+	dst->m21 = 0;
+	dst->m22 = c;
+	dst->m23 = -s;
+	dst->m24 = 0;
+	dst->m31 = 0;
+	dst->m32 = s;
+	dst->m33 = c;
+	dst->m34 = 0;
+	dst->m41 = 0;
+	dst->m42 = 0;
+	dst->m43 = 0;
+	dst->m44 = 1;
+}
+
+void attyr_rotate_y(float angle, attyr_mat4x4 *dst)
+{
+	float c = cos(angle), s = sin(angle);
+
+	dst->m11 = c;
+	dst->m12 = 0;
+	dst->m13 = s;
+	dst->m14 = 0;
+	dst->m21 = 0;
+	dst->m22 = 1;
+	dst->m23 = 0;
+	dst->m24 = 0;
+	dst->m31 = -s;
+	dst->m32 = 0;
+	dst->m33 = c;
+	dst->m34 = 0;
+	dst->m41 = 0;
+	dst->m42 = 0;
+	dst->m43 = 0;
+	dst->m44 = 1;
+}
+
+void attyr_rotate_z(float angle, attyr_mat4x4 *dst)
+{
+	float c = cos(angle), s = sin(angle);
+
+	dst->m11 = c;
+	dst->m12 = -s;
+	dst->m13 = 0;
+	dst->m14 = 0;
+	dst->m21 = s;
+	dst->m22 = c;
+	dst->m23 = 0;
+	dst->m24 = 0;
+	dst->m31 = 0;
+	dst->m32 = 0;
+	dst->m33 = 1;
+	dst->m34 = 0;
+	dst->m41 = 0;
+	dst->m42 = 0;
+	dst->m43 = 0;
+	dst->m44 = 1;
+}
+
+void attyr_translate(attyr_vec3 *mov, attyr_mat4x4 *dst)
+{
+	dst->m11 = 1;
+	dst->m12 = 0;
+	dst->m13 = 0;
+	dst->m14 = mov->x;
+	dst->m21 = 0;
+	dst->m22 = 1;
+	dst->m23 = 0;
+	dst->m24 = mov->y;
+	dst->m31 = 0;
+	dst->m32 = 0;
+	dst->m33 = 1;
+	dst->m34 = mov->z;
+	dst->m41 = 0;
+	dst->m42 = 0;
+	dst->m43 = 0;
+	dst->m44 = 1;
+}
+
+void attyr_scale(attyr_vec3 *scale, attyr_mat4x4 *dst)
+{
+	dst->m11 = scale->x;
+	dst->m12 = 0;
+	dst->m13 = 0;
+	dst->m14 = 0;
+	dst->m21 = 0;
+	dst->m22 = scale->y;
+	dst->m23 = 0;
+	dst->m24 = 0;
+	dst->m31 = 0;
+	dst->m32 = 0;
+	dst->m33 = scale->z;
+	dst->m34 = 0;
+	dst->m41 = 0;
+	dst->m42 = 0;
+	dst->m43 = 0;
+	dst->m44 = 1;
+}
+
+/*
+* Camera helpers.
+*
+* Note that ATTYR does not implement frustrum culling, nor does it require depth
+* values to be in [-1, 1]. So near and far planes are mostly pointless, and you
+* should generally use 0 as near.
+*/
+void attyr_perspective(float fov, float aspect, float near, attyr_mat4x4 *dst)
+{
+	float s = 1/tan(fov/2);
+
+	dst->m11 = s / aspect;
+	dst->m12 = 0;
+	dst->m13 = 0;
+	dst->m14 = 0;
+	dst->m21 = 0;
+	dst->m22 = s;
+	dst->m23 = 0;
+	dst->m24 = 0;
+	dst->m31 = 0;
+	dst->m32 = 0;
+	dst->m33 = 1;
+	dst->m34 = near;
+	dst->m41 = 0;
+	dst->m42 = 0;
+	dst->m43 = -1;
+	dst->m44 = 0;
+}
+
+void attyr_orthographic(float fov, float aspect, float near, attyr_mat4x4 *dst)
+{
+	float s = 1/tan(fov/2);
+
+	dst->m11 = s / aspect;
+	dst->m12 = 0;
+	dst->m13 = 0;
+	dst->m14 = 0;
+	dst->m21 = 0;
+	dst->m22 = s;
+	dst->m23 = 0;
+	dst->m24 = 0;
+	dst->m31 = 0;
+	dst->m32 = 0;
+	dst->m33 = 1;
+	dst->m34 = near;
+	dst->m41 = 0;
+	dst->m42 = 0;
+	dst->m43 = 0;
+	dst->m44 = 1;
 }

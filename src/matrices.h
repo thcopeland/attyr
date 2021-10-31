@@ -92,6 +92,13 @@ void attyr_init_mat4x3(attyr_mat4x3 *m, attyr_vec4 *col1, attyr_vec4 *col2, atty
 void attyr_init_mat4x4(attyr_mat4x4 *m, attyr_vec4 *col1, attyr_vec4 *col2, attyr_vec4 *col3, attyr_vec4 *col4);
 
 /*
+ * Initialize a diagonal matrix.
+ */
+void attyr_diag_mat2x2(float d, attyr_mat2x2 *dst);
+void attyr_diag_mat3x3(float d, attyr_mat3x3 *dst);
+void attyr_diag_mat4x4(float d, attyr_mat4x4 *dst);
+
+/*
  * Copy the entries of the src vector to dst.
  */
 void attyr_dup_vec2(attyr_vec2 *src, attyr_vec2 *dst);
@@ -124,6 +131,14 @@ float attyr_len_vec4(attyr_vec4 *v);
 void attyr_scale_vec2(attyr_vec2 *v, float s);
 void attyr_scale_vec3(attyr_vec3 *v, float s);
 void attyr_scale_vec4(attyr_vec4 *v, float s);
+
+/*
+ * Normalize a vector. If the given vector's length is zero, return
+ * don't change it. Returns 1 if the length was changed, 0 otherwise.
+ */
+float attyr_normalize_vec2(attyr_vec2 *v);
+float attyr_normalize_vec3(attyr_vec3 *v);
+float attyr_normalize_vec4(attyr_vec4 *v);
 
 /*
  * Multiply every entry in the matrix by a scalar.
@@ -186,6 +201,11 @@ float attyr_dot_vec3(attyr_vec3 *a, attyr_vec3 *b);
 float attyr_dot_vec4(attyr_vec4 *a, attyr_vec4 *b);
 
 /*
+ * Compute the vector cross product of two vectors.
+ */
+void attyr_cross_vec3(attyr_vec3 *a, attyr_vec3 *b, attyr_vec3 *dst);
+
+/*
  * Compute the product of two matrices, or a matrix and a vector, and place
  * the result in a third. The destination can be a factor as well.
  */
@@ -231,5 +251,21 @@ void attyr_mult_mat4x4_4x4(attyr_mat4x4 *a, attyr_mat4x4 *b, attyr_mat4x4 *dst);
  * determinant is sufficiently small, returns 0.
  */
 float attyr_invert_mat3x3(attyr_mat3x3 *m);
+
+/*
+ * Scale, rotate, and translate helpers.
+ */
+void attyr_rotate(attyr_vec3 *axis, float angle, attyr_mat4x4 *dst);
+void attyr_rotate_x(float angle, attyr_mat4x4 *dst);
+void attyr_rotate_y(float angle, attyr_mat4x4 *dst);
+void attyr_rotate_z(float angle, attyr_mat4x4 *dst);
+void attyr_translate(attyr_vec3 *mov, attyr_mat4x4 *dst);
+void attyr_scale(attyr_vec3 *scale, attyr_mat4x4 *dst);
+
+/*
+ * Camera helpers
+ */
+void attyr_perspective(float fov, float aspect, float near, attyr_mat4x4 *dst);
+void attyr_orthographic(float fov, float aspect, float near, attyr_mat4x4 *dst);
 
 #endif

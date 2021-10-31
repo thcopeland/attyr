@@ -1,6 +1,6 @@
 check_PROGRAMS = test_vectors test_matrices
 
-AM_CFLAGS = -I $(top_srcdir)/src
+AM_CFLAGS = -I $(top_srcdir)/src -lm
 
 test_helpers = test_helpers.c test_helpers.h $(top_srcdir)/src/matrices.c
 

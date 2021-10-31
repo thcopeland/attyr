@@ -48,7 +48,6 @@ After you install ATTYR, you can run the samples! This is a good way to check yo
 * Perspective correct interpolation is an essential part of rendering, and ATTYR implements it!
 * Perspective and orthographic cameras are both possible.
 * Includes a small matrix library.
-* Many software rasterizers drop near-plane tris (faces partially in front of and behind the camera) instead of clipping them properly. This is a serious problem if you're writing a game. ATTYR uses the [Olano-Greer rasterization algorithm](https://www.csee.umbc.edu/~olano/papers/2dh-tri/2dh-tri.pdf) and handles near-plane tris correctly and efficiently.
 * ATTYR is fast (particularly on Alacritty). In one test, ATTYR rendered 219,497 faces at 50 FPS at a resolution of 136x70.
 
 ## Usage

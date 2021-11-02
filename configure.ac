@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 m4_define([attyr_major_version], [1])
-m4_define([attyr_minor_version], [0])
+m4_define([attyr_minor_version], [1])
 m4_define([attyr_patch_version], [0])
 m4_define([attyr_version], [attyr_major_version.attyr_minor_version.attyr_patch_version])
 

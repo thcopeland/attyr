@@ -23,6 +23,7 @@ static void set_color(attyr_color_t *fragment, float r, float g, float b)
     fragment->b = b * 255;
 }
 
+// calculate a bounding box for the face being drawn
 static int calculate_bounds(attyr_vec4 *bounds, attyr_vec4 *verts)
 {
     attyr_vec4 *v1 = verts, *v2 = verts + 1, *v3 = verts + 2;
@@ -30,26 +31,23 @@ static int calculate_bounds(attyr_vec4 *bounds, attyr_vec4 *verts)
     attyr_init_vec4(bounds, 1, -1, 1, -1);
 
     if (v1->w <= 0 && v2->w <= 0 && v3->w <= 0) {
+        // no vertices in front of camera
         return 0;
     } else if (v1->w <= 0 || v2->w <= 0 || v3->w <= 0) {
-        for (int i = 0; i < 3; i++) {
-            attyr_vec4 *v = verts+i;
-
-            if (v->w <= 0) {
-                if (v->x <= 0) bounds->x = -1;
-                else bounds->y = 1;
-                if (v->y <= 0) bounds->z = -1;
-                else bounds->w = 1;
-            } else {
-                bounds->x = fmin(v->x/v->w, bounds->x);
-                bounds->y = fmax(v->x/v->w, bounds->y);
-                bounds->z = fmin(v->y/v->w, bounds->z);
-                bounds->w = fmax(v->y/v->w, bounds->w);
-            }
-        }
+        // difficult case, some vertices in front of and some behind camera
+        bounds->x = -1;
+        bounds->y = 1;
+        bounds->z = -1;
+        bounds->w = 1;
+        // refine bounds by quadrants
+        if (v1->x >= 0 && v2->x >= 0 && v3->x >= 0) bounds->x = 0;
+        if (v1->x <= 0 && v2->x <= 0 && v3->x <= 0) bounds->y = 0;
+        if (v1->y >= 0 && v2->y >= 0 && v3->y >= 0) bounds->z = 0;
+        if (v1->y <= 0 && v2->y <= 0 && v3->y <= 0) bounds->w = 0;
 
         return 1;
     } else {
+        // general case, all vertices in front of camera
         bounds->x = min3(v1->x/v1->w, v2->x/v2->w, v3->x/v3->w);
         bounds->y = max3(v1->x/v1->w, v2->x/v2->w, v3->x/v3->w);
         bounds->z = min3(v1->y/v1->w, v2->y/v2->w, v3->y/v3->w);
